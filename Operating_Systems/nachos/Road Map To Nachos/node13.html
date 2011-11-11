@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Mechanics of Thread Switching</TITLE>
+<META NAME="description" CONTENT="Mechanics of Thread Switching">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html237" HREF="node14.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html235" HREF="node12.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html229" HREF="node12.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html239" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html238" HREF="node14.html">Threads &amp; Scheduling</A>
+<B>Up:</B> <A NAME="tex2html236" HREF="node12.html">Nachos Threads</A>
+<B> Previous:</B> <A NAME="tex2html230" HREF="node12.html">Nachos Threads</A>
+<BR> <P>
+<H2><A NAME="SECTION00041000000000000000">Mechanics of Thread Switching</A></H2>
+<P>
+Switching the CPU from one thread to another involves suspending the
+current thread, saving its state (e.g., registers), and then restoring
+the state of the thread being switched to.  The thread switch actually
+completes at the moment a new program counter is loaded into PC;
+at that point, the CPU is no longer executing the thread switching
+code, it is executing code associated with the new thread.
+<P>
+The routine <EM>Switch(oldThread, nextThread)</EM> actually performs a
+thread switch.  <EM>Switch</EM> saves all of <EM>oldThread</EM>'s state
+(<EM>oldThread</EM> is the thread that is executing when <EM>Switch</EM>
+is called), so that it can resume executing the thread later, without
+the thread knowing it was suspended.  <EM>Switch</EM> does the
+following:
+<OL><LI> Save all registers in <EM>oldThread</EM>'s <EM>context</EM> <EM>
+block</EM>.<LI> What address should we save for the PC? That is, when we later
+resume running the just-suspended thread, where do we want it to
+continue execution? We want execution to resume as if the call to <EM>
+Switch()</EM> had returned via the normal procedure call
+mechanism. Specifically, we want to resume execution at the
+instruction immediately following the call to <EM>Switch()</EM>.  Thus,
+instead of saving the current PC, we place the return address (found
+on the stack in the thread's activation record) in the thread's
+context block. When the thread is resumed later, the resuming address
+loaded into the PC will be the instruction immediately following the
+``call'' instruction that invoked <EM>Switch()</EM> earlier.
+<P>
+Note: It is crucial that <EM>Switch()</EM> appear to be a regular
+procedure call to whoever calls it. That way, threads may call <EM>
+Switch()</EM> whenever they want. The call will appear to return just
+like a normal procedure call <EM>except</EM> that the return does not 
+take place right away. Only after the scheduler decides to resume
+execution of the switched thread will it run again.<LI> Once the current thread's state has been saved, load new values
+into the registers from the context block of the next thread.<LI> At what exact point has a context switch taken place? When
+the current PC is replaced by the saved PC found in the process
+table. Once the saved PC is loaded, <EM>Switch()</EM> is no longer
+executing; we are now executing instructions associated with the new
+thread, which should be the instruction immediately following the call
+to <EM>Switch()</EM>. As soon as the new PC is loaded, a context switch
+has taken place.
+<P>
+</OL>
+<P>
+The routine <EM>Switch()</EM> is written in assembly language
+because it is a machine-depended routine.  It has to manipulate
+registers, look into the thread's stack, etc.
+<P>
+Note: After returning from <EM>Switch</EM>, the previous thread is no
+longer running. Thread <EM>nextThread</EM> is running now. But
+because it also called <EM>Switch()</EM> previously, it will return to
+the ``right place'' (the instruction after the call to <EM>
+Switch()</EM>).  Thus, it looks like <EM>Switch()</EM> is a ``normal''
+procedure call, but in fact, a thread switch has taken place.
+<P>
+<HR><A NAME="tex2html237" HREF="node14.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html235" HREF="node12.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html229" HREF="node12.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html239" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html238" HREF="node14.html">Threads &amp; Scheduling</A>
+<B>Up:</B> <A NAME="tex2html236" HREF="node12.html">Nachos Threads</A>
+<B> Previous:</B> <A NAME="tex2html230" HREF="node12.html">Nachos Threads</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Synchronization</TITLE>
+<META NAME="description" CONTENT="Synchronization">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html458" HREF="node33.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html456" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html450" HREF="node31.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html460" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html459" HREF="node33.html">Multiprogramming</A>
+<B>Up:</B> <A NAME="tex2html457" HREF="node30.html">Experience With Nachos Assignments</A>
+<B> Previous:</B> <A NAME="tex2html451" HREF="node31.html">General Tips</A>
+<BR> <P>
+<H2><A NAME="SECTION00072000000000000000">Synchronization</A></H2>
+<P>
+Testing the correctness of the synchronization facilities is difficult
+if only Nachos threads are used because Nachos preempts threads only
+at well defined points (e.g., when disabling or re-enabling
+interrupts). Thus, many incorrect solutions tend to work on the simple
+test cases students use.  Fear not, later assignments test the
+synchronization facilities extensively and will uncover problems. Here
+are some suggestions for simplifying later debugging:
+<P>
+<OL><LI> For the locking routines, have <EM>Acquire</EM> verify that the
+caller does not already hold the lock via an ASSERT statement.  One
+common problem occurring in later assignments involves nested locking,
+where a thread already holding a lock attempts to acquire it
+again. Nachos can't always detect this deadlock condition itself (e.g,
+if the Console device is in use) and students with deadlocked programs
+spend a long time not knowing where to look before they realize
+they've deadlocked.
+<P>
+</OL>
+<P>
+Another most common mistake students made while implementing locks is
+failing to understand their semantics (even having covered them in
+class).  Specifically, students tended to have a flag or counter
+associated with condition variables.  The following explanation will
+hopefully clarify this point and explain why a condition variable
+cannot have a value.
+<P>
+Semaphores have a count associated with them.  This count is a
+``memory'' that allows a semaphore to ``remember'' how many times the
+semaphore has been signalled (via <EM>P</EM>) relative to the number of
+times it has been signalled (via <EM>V</EM>).  Semaphores are useful as
+gatekeepers that must limit the number of persons (threads) allowed to
+be in a room simultaneously. Threads enter the room enter through one
+door (the <EM>P</EM> operation) and leave through a second door (the
+<EM>V</EM> operation).  The semaphore's value keeps track of the number
+of threads in the room at any given time. If the semaphore's initial
+value is 1, only one thread may be in the room at a time, whereas an
+initial value of 100 allows the room to hold 100 threads.
+<P>
+In contrast, a condition variable has <EM>no</EM> value associated with
+it.  If a thread invokes <EM>Wait</EM>, it blocks <EM>no matter
+what!</EM> Specifically, it blocks regardless of how many previous <EM>
+Signal</EM> operations were performed.  In contrast, the semaphore <EM>
+P</EM> operation blocks only when the count is non-positive, with the
+current value dependent on the initial counter and the number of <EM>
+V</EM> operations that have been performed. One uses a semaphore (and
+its counter) only when the number of <EM>P</EM>'s and <EM>V</EM>'s must
+balance each other. Note also that the condition <EM>Signal</EM>
+operations wakes up one blocked thread (if one is waiting on the
+condition), but has no effect otherwise.  If there are no threads
+waiting on a condition, executing <EM>Wait</EM> one time has the same
+effect as executing it 1,000 times (e.g., no effect).  Compare this
+behavior with the semaphore <EM>V</EM> operation. Even when no threads
+are waiting on the semaphore, the <EM>V</EM> operation  increments the
+semaphore's value, which influences  <EM>P</EM>'s behavior later.
+<P>
+There are times when a thread may wish to wait for some future event,
+but the conditions necessary that define the event can't be described
+with a simple count. For example, a thread may wish to wait for two
+resources to become available simultaneously, but does not wish to
+hold one while it is blocked waiting for the other.  In this case, a
+thread might wait on a condition variable, with another thread issuing
+a <EM>Signal</EM> when the necessary condition (both resources
+available <EM>simultaneously</EM>) becomes true. Note that only the
+code that calls <EM>Signal</EM> and <EM>Wait</EM> know what the exact
+conditions are. Thus, the condition variable itself cannot hold a
+meaningful value.
+<P>
+Finally, note that Nachos intends condition variables to have
+``Mesa-style'' semantics. In brief, when a <EM>Signal</EM> operation
+releases a thread, that thread can <EM>not</EM> assume that the
+condition that it waited for is now true. It must first reassert that
+the necessary condition still holds (e.g., it must test the condition
+in a while loop, calling <EM>Wait</EM> again whenever the condition is
+false). This is necessary because another thread may be scheduled and
+execute between the time of <EM>Signal</EM> and the running of the
+waiting thread.  That intermediate thread may change the state of the
+system so that the waited-on condition no longer holds.
+<P>
+<HR><A NAME="tex2html458" HREF="node33.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html456" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html450" HREF="node31.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html460" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html459" HREF="node33.html">Multiprogramming</A>
+<B>Up:</B> <A NAME="tex2html457" HREF="node30.html">Experience With Nachos Assignments</A>
+<B> Previous:</B> <A NAME="tex2html451" HREF="node31.html">General Tips</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

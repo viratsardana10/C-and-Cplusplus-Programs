@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Nachos Machine</TITLE>
+<META NAME="description" CONTENT="Nachos Machine">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html117" HREF="node4.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html115" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html109" HREF="node2.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html119" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html118" HREF="node4.html">Machine Components</A>
+<B>Up:</B> <A NAME="tex2html116" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html110" HREF="node2.html">Introduction to Nachos</A>
+<BR> <P>
+<H1><A NAME="SECTION00030000000000000000">Nachos Machine</A></H1>
+<P>
+<A NAME="machine">&#160;</A>
+Nachos simulates a machine that roughly approximates the MIPS
+architecture.  The machine has registers, memory and a cpu.  In
+addition, an event-driven simulated clock provides a mechanism to
+schedule interrupts and execute them at a later time.  The simulated
+MIPS machine can execute arbitrary programs. One simply loads
+instructions into the machine's memory, initializes registers
+(including the program counter PCReg) and then tells the machine to
+start executing instructions.  The machine then fetches the
+instruction PCReg points at, decodes it, and executes it.  The process
+is repeated indefinitely, until an illegal operation is performed or a
+hardware interrupt is generated. When a trap or interrupt takes place,
+execution of MIPS instructions is suspended, and a Nachos interrupt
+service routine is invoked to deal with the condition.
+<P>
+Conceptually, Nachos has two modes of execution, one of which is the
+MIPS simulator. Nachos executes user-level processes by loading them
+into the simulator's memory, initializing the simulator's registers and
+then running the simulator. User-programs can only access the memory
+associated with the simulated machine.  The second mode corresponds to
+the Nachos ``kernel.''  The kernel executes when Nachos first starts
+up, or when a user-program executes an instruction that causes a
+hardware trap (e.g., illegal instruction, page fault, system call,
+etc.). In ``kernel mode'', Nachos executes the way normal Unix
+processes execute. That is, the statements corresponding to the Nachos
+source code are executed, and the memory accessed corresponds to the
+memory assigned to Nachos variables.
+<P>
+Nachos does not have to execute user-level programs in order to
+perform useful things.  Nachos supports kernel threads, allowing
+multiple threads to execute concurrently. In this context, Nachos
+behaves in a manner analogous to other thread packages.  Indeed,
+user-level processes are executed by having a kernel thread invoke the
+simulator.  Thus, multiprogramming makes use of multiple threads; each
+user-level process has a Nachos kernel thread associated with it to
+provide a context for executing the MIPS simulator.
+<P>
+<BR> <HR>
+<UL> 
+<LI> <A NAME="tex2html120" HREF="node4.html#SECTION00031000000000000000">Machine Components</A>
+<LI> <A NAME="tex2html121" HREF="node5.html#SECTION00032000000000000000">Interrupt Management</A>
+<LI> <A NAME="tex2html122" HREF="node6.html#SECTION00033000000000000000">Real-Time Clock Interrupts</A>
+<LI> <A NAME="tex2html123" HREF="node7.html#SECTION00034000000000000000">Address Translation</A>
+<UL> 
+<LI> <A NAME="tex2html124" HREF="node8.html#SECTION00034100000000000000">Linear Page Tables</A>
+<LI> <A NAME="tex2html125" HREF="node9.html#SECTION00034200000000000000">Software Managed TLB</A>
+</UL> 
+<LI> <A NAME="tex2html126" HREF="node10.html#SECTION00035000000000000000">Console Device</A>
+<LI> <A NAME="tex2html127" HREF="node11.html#SECTION00036000000000000000">Disk Device</A>
+</UL>
+<HR><A NAME="tex2html117" HREF="node4.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html115" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html109" HREF="node2.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html119" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html118" HREF="node4.html">Machine Components</A>
+<B>Up:</B> <A NAME="tex2html116" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html110" HREF="node2.html">Introduction to Nachos</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

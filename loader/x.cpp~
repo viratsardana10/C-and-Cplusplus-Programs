@@ -1,0 +1,10 @@
+#include <iostream>
+#include <process>
+using namespace std;
+
+int main()
+{
+	cout<<"In x.cpp\n";
+	cout<<getpid()<<endl;
+	return 0;
+}

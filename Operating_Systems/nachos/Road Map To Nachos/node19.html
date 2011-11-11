@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Creating a Noff Binary</TITLE>
+<META NAME="description" CONTENT="Creating a Noff Binary">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html305" HREF="node20.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html303" HREF="node17.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html297" HREF="node18.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html307" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html306" HREF="node20.html">System Calls and Exception </A>
+<B>Up:</B> <A NAME="tex2html304" HREF="node17.html">User-Level Processes</A>
+<B> Previous:</B> <A NAME="tex2html298" HREF="node18.html">Process Creation</A>
+<BR> <P>
+<H2><A NAME="SECTION00052000000000000000">Creating a Noff Binary</A></H2>
+<P>
+Nachos is capable of executing a program containing arbitrary MIPS
+instructions. For example, C programs in the <EM>test</EM> directory
+are compiled using <EM>gcc</EM> on a MIPS machine to create ``.o''
+files. To create an <EM>a.out</EM> binary file, the loader prepends the
+instructions in <EM>test/start.s</EM> before the code of the user
+program. File <EM>start.s</EM> contains initialization code that needs
+to be executed before the user's main program. Specifically, the very
+first instruction in <EM>start.s</EM> calls the user-supplied <EM>
+main</EM> routine, whereas the second instruction invokes the Nachos
+<EM>Exit</EM> system call, insuring that user processes terminate
+properly when their main program returns.  In addition, <EM>
+start.s</EM> contains stub modules for invoking system calls (described
+below).
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

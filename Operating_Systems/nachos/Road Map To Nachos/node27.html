@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>File Header</TITLE>
+<META NAME="description" CONTENT="File Header">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html399" HREF="node28.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html397" HREF="node26.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html391" HREF="node26.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html401" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html400" HREF="node28.html">Directories</A>
+<B>Up:</B> <A NAME="tex2html398" HREF="node26.html">File System Physical Representation</A>
+<B> Previous:</B> <A NAME="tex2html392" HREF="node26.html">File System Physical Representation</A>
+<BR> <P>
+<H3><A NAME="SECTION00064100000000000000">File Header</A></H3>
+<P>
+Each Nachos file has an associated <EM>FileHeader</EM> structure.  The
+<EM>FileHeader</EM> is similar to a Unix <EM>inode</EM> in that it
+contains all the essential information about a file, such as the
+file's current size and pointers to its physical disk blocks.
+Specifically, a Nachos' <EM>FileHeader</EM> contains the current size
+of the file in bytes, the number of sectors that have been allocated
+to the file and an array of sector numbers identifying the specific
+disk sector numbers where the file's data blocks are located. Recall
+that when a file is initially created, the caller specifies the size
+of the file.  At file creation time, Nachos allocates enough sectors
+to match the requested size. Thus, as data is appended to the file, no
+sectors need be allocated.  The current size field indicates how much
+of the file currently contains meaningful data.
+<P>
+Note that a <EM>FileHeader</EM> contains only ``direct'' pointers to
+the file's data blocks, limiting the maximum size of a Nachos file to
+just under 4K bytes.
+<P>
+The following <EM>FileHeader</EM> operations are supported:
+<DL ><DT><STRONG>bool Allocate(BitMap *bitMap, int fileSize):</STRONG>
+<DD> Find and allocate
+enough free sectors for <EM>fileSize</EM> bytes of data. Nachos uses a
+bit vector to keep track of which sectors are allocated and which are
+free.  Argument <EM>bitMap</EM> is the bit map from which data blocks
+are to be allocated (e.g., the freelist).
+<P>
+<DT><STRONG>void Deallocate(BitMap *bitMap):</STRONG>
+<DD> Return to the free list
+(e.g., <EM>bitMap</EM>) the blocks allocated to this file
+(header). Only the file's data blocks are deallocated; the sector
+containing the <EM>FileHeader</EM> itself must be freed
+separately. This operation is invoked when a file is deleted from the
+system.
+<P>
+<DT><STRONG>void FetchFrom(int sectorNumber):</STRONG>
+<DD> Read the <EM>FileHeader</EM>
+stored in sector <EM>sectorNumber</EM> from the underlying disk.
+<P>
+<DT><STRONG>void WriteBack(int sectorNumber)</STRONG>
+<DD> Write the <EM>FileHeader</EM>
+to sector number <EM>sectorNumber</EM>.
+<P>
+<DT><STRONG>int FileLength():</STRONG>
+<DD> Return the current size of the file.
+<P>
+<DT><STRONG>int ByteToSector(int offset)</STRONG>
+<DD> Map the offset within a file into
+the actual sector number that contains that data byte.
+<P>
+ </DL>
+<P>
+Because a <EM>FileHeader</EM> fits into a single sector, the sector
+number containing a <EM>FileHeader</EM> uniquely identifies that
+file. We will use <EM>fnode</EM> (for FileheaderNODE) to refer to a
+sector  that contains a <EM>FileHeader</EM>.
+<P>
+<HR><A NAME="tex2html399" HREF="node28.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html397" HREF="node26.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html391" HREF="node26.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html401" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html400" HREF="node28.html">Directories</A>
+<B>Up:</B> <A NAME="tex2html398" HREF="node26.html">File System Physical Representation</A>
+<B> Previous:</B> <A NAME="tex2html392" HREF="node26.html">File System Physical Representation</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

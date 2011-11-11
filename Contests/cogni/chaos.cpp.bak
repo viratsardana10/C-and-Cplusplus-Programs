@@ -1,0 +1,67 @@
+#include <iostream>
+#include <map>
+#include <set>
+#include <list>
+#include <iterator>
+#include <stack>
+#include <vector>
+using namespace std;
+
+int V, R, TR;
+struct graph {
+	string s1;
+	string s2;
+	int dist;
+} *track;
+
+struct rail {
+	string orig;
+	string dest;
+	int speed;
+} *train;
+
+typedef set<string> node_set;
+typedef map<string, node_set> Map;
+Map node;
+
+typedef map<string, string> Map_s;
+typedef map<Map_s, int> Map_i;
+
+map<string, int> Map_w;
+Map_w weight;
+Map_w speed;
+Map_s train;
+
+int main()
+{
+	int T;
+	cin >> T;
+	while(T--) {
+		cin >> V >> R;
+
+		track = new struct graph[R];
+
+		string s1, s2;
+		int dist;
+		for(int i = 0 ; i < R; ++i) {
+			cin >> s1 >> s2;
+			cin >> dist;
+			track[i].s1 = s1;
+			track[i].s2 = s2;
+			track[i].dist = dist;
+		}
+	
+		cin >> TR;
+		train = new struct rail[TR];
+		
+		int speed;
+		for(int i = 0 ; i < TR; ++i) {
+			cin >> s1 >> s2;
+			cin >> speed;
+			train[i].orig = s1;
+			train[i].dest = s2;
+			train[i].speed = speed;	
+		}
+	}
+	return 0;
+}	

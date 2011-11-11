@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Interrupt Management</TITLE>
+<META NAME="description" CONTENT="Interrupt Management">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html147" HREF="node6.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html145" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html139" HREF="node4.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html149" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html148" HREF="node6.html">Real-Time Clock Interrupts</A>
+<B>Up:</B> <A NAME="tex2html146" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html140" HREF="node4.html">Machine Components</A>
+<BR> <P>
+<H2><A NAME="SECTION00032000000000000000">Interrupt Management</A></H2>
+<P>
+Nachos simulates interrupts by maintaining an event queue together
+with a simulated clock. As the clock ticks, the event queue is
+examined to find events scheduled to take place now.  The clock is
+maintained entirely in software and ticks under the following
+conditions:
+<OL><LI> Every time interrupts are restored (and the restored interrupt
+mask has interrupts enabled), the clock advances one tick. Nachos code
+frequently disables and restores interrupts for mutual exclusion
+purposes by making explicit calls to <EM>interrupt::SetLevel()</EM>.<LI> Whenever the MIPS simulator executes one instruction, the clock
+advances one tick.<LI> Whenever the ready list is empty, the clock advances however
+many ticks are needed to fast-forward the current time to that of the
+next scheduled event.
+</OL>
+<P>
+Whenever the clock advances, the event queue is examined and any
+pending interrupt events are serviced by invoking the procedure
+associated with the timer event (e.g., the interrupt service
+routine). All interrupt service routines are run with interrupts
+disabled, and the interrupt service routine may not re-enable them.
+<P>
+Warning: in interrupt handler may <B>not</B> call any routines that
+lead to a context switch of the current thread (e.g., <EM>
+scheduler::Run()</EM> or <EM>SWITCH()</EM> ).  Doing so may lead to
+deadlock. This restriction is an artifact of the way interrupts are
+simulated under Nachos, and should not be taken as an indication of
+the way things are done on real machines.  Specifically, consider the
+case where multiple events happen to be scheduled at <EM>exactly</EM>
+the same time.  If the handler for the first event invokes <EM>
+sleep</EM> (which calls <EM>SWITCH</EM>), the others won't be serviced at
+the right time.  In fact, the thread that called <EM>sleep</EM> may
+actually be waiting for one of the other events that is supposed to
+take place now, but is delayed because of the <EM>SWITCH</EM>. We now
+have a deadlock<A NAME="tex2html2" HREF="footnode.html#683"><IMG  ALIGN=BOTTOM ALT="gif" SRC="http://www.cs.duke.edu/icons/latex/foot_motif.gif"></A>.
+<P>
+All routines related to interrupt management are provided by the <EM>
+Interrupt</EM> object.  The main routines of interest include:
+<P>
+<DL ><DT><STRONG>void Schedule(VoidFunctionPtr handler, int arg, int when,
+IntType type)</STRONG>
+<DD> schedules a future event to take place at time <EM>
+when</EM>.  When it is time for the scheduled event to take place,
+Nachos calls the routine <EM>handler</EM> with the single argument <EM>
+arg</EM>.
+<P>
+<DT><STRONG>IntStatus SetLevel(IntStatus level)</STRONG>
+<DD> Change the interrupt mask
+to <EM>level</EM>, returning the previous value.  This routine is used
+to temporarily disable and re-enable interrupts for mutual
+exclusion purposes. Only two interrupt levels are supported: <EM>
+IntOn</EM> and <EM>IntOff</EM>.
+<P>
+<DT><STRONG>OneTick()</STRONG>
+<DD> advances the clock one tick and services any pending
+requests (by calling <EM>CheckIfDue</EM>). It is called from <EM>
+machine::Run()</EM> after each user-level instruction is executed, as well
+as by <EM>SetLevel</EM> when the interrupts are restored.
+<P>
+<DT><STRONG>bool CheckIfDue(bool advanceClock)</STRONG>
+<DD> examines the event queue
+for events that need servicing now. If it finds any, it services them.
+It is invoked in such places as <EM>OneTick</EM>.
+<P>
+<DT><STRONG>Idle()</STRONG>
+<DD> ``advances'' to the clock to the time of the next
+scheduled event. It is called by the scheduler (actually <EM>
+Sleep()</EM>) when there are no more threads on the ready list and we
+want to ``fast-forward'' the time.
+<P>
+ </DL><HR><A NAME="tex2html147" HREF="node6.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html145" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html139" HREF="node4.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html149" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html148" HREF="node6.html">Real-Time Clock Interrupts</A>
+<B>Up:</B> <A NAME="tex2html146" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html140" HREF="node4.html">Machine Components</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

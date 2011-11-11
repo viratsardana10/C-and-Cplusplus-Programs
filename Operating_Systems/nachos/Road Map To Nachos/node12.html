@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Nachos Threads</TITLE>
+<META NAME="description" CONTENT="Nachos Threads">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html222" HREF="node13.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html220" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html214" HREF="node11.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html224" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html223" HREF="node13.html">Mechanics of Thread Switching</A>
+<B>Up:</B> <A NAME="tex2html221" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html215" HREF="node11.html">Disk Device</A>
+<BR> <P>
+<H1><A NAME="SECTION00040000000000000000">Nachos Threads</A></H1>
+<P>
+In Nachos (and many systems) a <EM>process</EM> consists of:
+<OL><LI> An <EM>address</EM> <EM>space</EM>. The address space includes all
+the memory the process is allowed to reference.  In some systems, two
+or more processes may share part of an address space, but in
+traditional systems the contents of an address space is private to
+that process.  The address space is further broken down into 1)
+Executable code (e.g., the program's instructions), 2) Stack space for
+local variables and 3) Heap space for global variables and dynamically
+allocated memory (e.g., such as obtained by the Unix <EM>malloc</EM> or
+C++ <EM>new</EM> operator). In Unix, heap space is further broken down
+into BSS (contains variables initialized to 0) and DATA sections
+(initialized variables and other constants).<LI> A single thread of control, e.g., the CPU executes instructions
+sequentially within the process.<LI> Other objects, such as open file descriptors.
+</OL>
+<P>
+That is, a process consists of a program, its data and all the state
+information (memory, registers, program counter, open files, etc.)
+associated with it.
+<P>
+It is sometimes useful to allow multiple threads of control to execute
+concurrently within a single process.  These individual threads of
+control are called <EM>threads.</EM> By default, processes have only a
+single thread associated with them, though it may be useful to have
+several.  All the threads of a particular process share the same
+address space. In contrast, one generally thinks of processes as not
+sharing any of their address space with other processes. Specifically,
+threads (like processes) have code, memory and other resources
+associated with them.  Although threads share many objects with other
+threads of that process, threads have their own <EM>private</EM> local
+stack<A NAME="tex2html3" HREF="footnode.html#213"><IMG  ALIGN=BOTTOM ALT="gif" SRC="http://www.cs.duke.edu/icons/latex/foot_motif.gif"></A>.
+<P>
+One big difference between threads and processes is that global
+variables are shared among all threads. Because threads execute
+concurrently with other threads, they must worry about synchronization
+and mutual exclusion when accessing shared memory.
+<P>
+Nachos provides threads.  Nachos threads execute and share the same
+code (the Nachos source code) and share the same global variables.
+<P>
+The Nachos scheduler maintains a data structure called a <EM>ready</EM>
+<EM>list</EM>, which keeps track of the threads that are ready to
+execute. Threads on the ready list are ready to execute and can be
+selected for executing by the scheduler at any time.  Each thread has
+an associated <I>state</I> describing what the thread is currently
+doing.  Nachos' threads are in one of four states:
+<DL ><DT><STRONG>READY:</STRONG>
+<DD> The thread is eligible to use the CPU (e.g, it's on the
+ready list), but another thread happens to be running.  When the
+scheduler selects a thread for execution, it removes it from the ready
+list and changes its state from READY to RUNNING.  Only threads in the
+READY state should be found on the ready list.
+<P>
+<DT><STRONG>RUNNING:</STRONG>
+<DD> The thread is currently running. Only one thread can
+be in the RUNNING state at a time.  In Nachos, the global variable
+<EM>currentThread</EM> always points to the currently running thread.
+<P>
+<DT><STRONG>BLOCKED:</STRONG>
+<DD> The thread is blocked waiting for some external
+event; it cannot execute until that event takes place. Specifically,
+the thread has put itself to sleep via <EM>Thread::Sleep()</EM>. It may
+be waiting on a condition variable, semaphore, etc.  By definition, a
+blocked thread does not reside on the ready list.
+<P>
+<DT><STRONG>JUST_CREATED:</STRONG>
+<DD> The thread exists, but has no stack yet. This
+state is a temporary state used during thread creation. The <EM>
+Thread</EM> constructor creates a thread, whereas <EM>Thread::Fork()</EM>
+actually turns the thread into one that the CPU can execute (e.g., by
+placing it on the ready list).
+<P>
+ </DL>
+<P>
+In non-object oriented systems, operating systems maintain a data
+structure called a <EM>process</EM> <EM>table</EM>.  Process (thread)
+table entries contain all the information associated with a process
+(e.g., saved register contents, current state, etc.).  The process
+table information is frequently called a <EM>context</EM> <EM>
+block</EM>.
+<P>
+In contrast to other systems, Nachos does not maintain an explicit
+process table.  Instead, information associated with thread is
+maintained as (usually) private data of a <EM>Thread</EM> object
+instance.  Thus, where a conventional operating system keeps thread
+information centralized in a single table, Nachos scatters its
+``thread table entries'' all around memory; to get at a specific
+thread's information, a pointer to the thread instance is needed.
+<P>
+The Nachos <EM>Thread</EM> object supports the following operations:
+<DL ><DT><STRONG>Thread *Thread(char *debugName)</STRONG>
+<DD> The <EM>Thread</EM> constructor
+does only minimal initialization. The thread's status is set to
+JUST_CREATED, its stack is initialized to NULL, its given the
+name <EM>debugName</EM>, etc.
+<P>
+<DT><STRONG>Fork(VoidFunctionPtr func, int arg)</STRONG>
+<DD> does the interesting work
+of thread creation, turning a thread into one that the CPU can
+schedule and execute.
+<P>
+Argument <EM>func</EM> is the address of a procedure where execution is
+to begin when the thread starts executing. Argument <EM>arg</EM> is a
+an argument that should be passed to the new thread. (Of course,
+procedure <EM>func</EM> must expect a single argument to be passed to
+it if it is to access the supplied argument.)
+<P>
+<EM>Fork</EM> allocates stack space for the new thread, initializes the
+registers (by saving the initial value's in the thread's context
+block), etc.
+<P>
+One important detail must be considered. What should happen when
+procedure <EM>func</EM> returns? Since <EM>func</EM> was not called as a
+regular procedure call, there is no place for it to return to. Indeed,
+rather than returning, the thread running <EM>func</EM> should
+terminate.  <EM>Fork</EM> takes care of this detail by building an
+initial activation record that makes this happen (described in detail
+below).
+<P>
+<DT><STRONG>void StackAllocate(VoidFunctionPtr func, int arg)</STRONG>
+<DD> This routine
+does the dirty work of allocating the stack and creating an initial
+activation record that causes execution to appear to begin in <EM>
+func</EM>. The details are a somewhat complicated. Specifically, <EM>
+StackAllocate</EM> does the following:
+<P>
+<OL><LI> Allocate memory for the stack. The default stack size is <EM>
+StackSize</EM> (4096) 4-byte integers.<LI> Place a sentinel value at the top of the allocated stack.
+Whenever it switches to a new thread, the scheduler verifies that the
+sentinel value of the thread being switched out has not changed, as
+might happen if a thread overflows its stack during execution.<LI> Initialize the program counter PC to point to the routine
+<EM>ThreadRoot</EM>. Instead of beginning execution at the
+user-supplied routine, execution actually begins in routine <EM>
+ThreadRoot</EM>. <EM>ThreadRoot</EM> does the following:
+<OL><LI> Calls an initialization routine that simply enables interrupts.<LI> Calls the user-supplied function, passing it the supplied
+argument.<LI> Calls <EM>thread::Finish()</EM>, to terminate the thread.  
+</OL>
+Having thread execution begin in <EM>ThreadRoot</EM> rather than in the
+user-supplied routine makes it straightforward to terminate the thread
+when it finishes.  The code for <EM>ThreadRoot</EM> is written in
+assembly language and is found in <EM>switch.s</EM>
+Note: <EM>ThreadRoot</EM> isn't run by the thread that calls <EM>
+Fork()</EM>. The newly created thread executes the instructions in
+<EM>ThreadRoot</EM> when it is scheduled and starts execution.
+</OL>
+<P>
+<DT><STRONG>void Yield()</STRONG>
+<DD> Suspend the calling thread and select a new one
+for execution (by calling Scheduler::FindNextToRun()).
+If no other threads are ready to execute, continue
+running the current thread.
+<P>
+<DT><STRONG>void Sleep()</STRONG>
+<DD> Suspend the current thread, change its state to
+BLOCKED, and remove it from the ready list.  If the ready list is
+empty, invoke <EM>interrupt-&gt;Idle()</EM> to wait for the next
+interrupt.  <EM>Sleep</EM> is called when the current thread needs to
+be blocked until some future event takes place. It is the
+responsibility of this ``future event'' to wake up the blocked thread
+and move it back on to the ready list.
+<P>
+<DT><STRONG>void Finish()</STRONG>
+<DD> Terminate the currently running thread. In
+particular, return such data structures as the stack to the system,
+etc.  Note that it is not physically possible for a currently running
+thread to terminate itself properly. As the current thread executes,
+it makes use of its stack. How can we free the stack while the thread
+is still using it?  The solution is to have a <EM>different</EM> thread
+actually deallocate the data structures of a terminated thread.  Thus,
+<EM>Finish</EM> sets the global variable <EM>threadToBeDestroyed</EM> to
+point to the current thread, but does not actually terminate it. <EM>
+Finish</EM> then calls <EM>Sleep</EM>, which effectively terminates the
+thread (e.g., it will never run again).  Later, when the scheduler
+starts running another thread, the newly scheduled thread examines the
+<EM>threadToBeDestroyed</EM> variable and finishes the job.
+<A NAME="finishproblem">&#160;</A>
+<P>
+ </DL><BR> <HR>
+<UL> 
+<LI> <A NAME="tex2html225" HREF="node13.html#SECTION00041000000000000000">Mechanics of Thread Switching</A>
+<LI> <A NAME="tex2html226" HREF="node14.html#SECTION00042000000000000000">Threads &amp; Scheduling</A>
+<LI> <A NAME="tex2html227" HREF="node15.html#SECTION00043000000000000000">Synchronization and Mutual Exclusion</A>
+<LI> <A NAME="tex2html228" HREF="node16.html#SECTION00044000000000000000">Special Notes</A>
+</UL>
+<HR><A NAME="tex2html222" HREF="node13.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html220" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html214" HREF="node11.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html224" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html223" HREF="node13.html">Mechanics of Thread Switching</A>
+<B>Up:</B> <A NAME="tex2html221" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html215" HREF="node11.html">Disk Device</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

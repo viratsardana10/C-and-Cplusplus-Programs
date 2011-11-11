@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Machine Components</TITLE>
+<META NAME="description" CONTENT="Machine Components">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html136" HREF="node5.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html134" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html128" HREF="node3.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html138" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html137" HREF="node5.html">Interrupt Management</A>
+<B>Up:</B> <A NAME="tex2html135" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html129" HREF="node3.html">Nachos Machine</A>
+<BR> <P>
+<H2><A NAME="SECTION00031000000000000000">Machine Components</A></H2>
+<P>
+The Nachos/MIPS machine is implemented by the <EM>Machine</EM> object,
+an instance of which is created when Nachos first starts up.  The <EM>
+Machine</EM> object exports a number of operations and public variables
+that the Nachos kernel accesses directly. In the following, we
+describe some of the important variables of the <EM>Machine</EM>
+object; describing their role helps explain what the simulated
+hardware does.
+<P>
+The Nachos <EM>Machine</EM> object provides registers, physical memory,
+virtual memory support as well as operations to run the machine or
+examine its current state. When Nachos first starts up, it creates an
+instance of the <EM>Machine</EM> object and makes it available through
+the global variable <EM>machine</EM>.  The following public variables
+are accessible to the Nachos kernel:
+<P>
+<DL ><DT><STRONG>registers:</STRONG>
+<DD> An array of 40 registers, which include such special
+registers as a stack pointer, a double register for multiplication
+results, a program counter, a next program counter (for branch
+delays), a register target for delayed loads, a value to be loaded on
+a delayed load, and the bad virtual address after a translation fault.
+The registers are number 0-39; see the file <EM>machine.h</EM> for
+symbolic names for the registers having special meaning (e.g., <EM>
+PCReg</EM>).
+<P>
+Although registers can be accessed directly via <EM>
+machine-&gt;registers[x]</EM>, the <EM>Machine</EM> object provides special
+<EM>ReadRegister()</EM> and <EM>WriteRegister()</EM> routines for this
+purpose (described in more detail below).
+<P>
+<DT><STRONG>mainMemory:</STRONG>
+<DD> Memory is byte-addressable and organized into
+128-byte pages, the same size as disk sectors.  Memory corresponding
+to physical address <EM>x</EM> can be accessed in Nachos at <EM>
+machine-&gt;mainMemory[x]</EM>.  By default, the Nachos MIPS machine has
+31 pages of physical memory. The actual number of pages used is
+controlled by the <EM>NumPhysPages</EM> variable in <EM>machine.h</EM>.
+<P>
+<DT><STRONG>Virtual Memory</STRONG>
+<DD> Nachos supports VM through either a single
+linear page table or a software-managed TLB (though not
+simultaneously).  The choice of which is in effect is controlled by
+initializing the <EM>tlb</EM> or <EM>pageTable</EM> variables of the
+<EM>machine</EM> class. When executing instructions, the <EM>
+Machine</EM> object uses whichever is defined, after verifying that they
+are not both set simultaneously.
+<P>
+ </DL>
+<P>
+At this point, we know enough about the <EM>Machine</EM> object to
+explain how it executes arbitrary user programs.  First, we load the
+program's instructions into the machine's physical memory (e.g, the
+<EM>machine-&gt;mainMemory</EM> variable). Next, we initialize the
+machine's page tables and registers. Finally we invoke <EM>
+machine-&gt;Run()</EM>, which begins the fetch-execute cycle for the
+machine.
+<P>
+The <EM>Machine</EM> object provides the following operations:
+<DL ><DT><STRONG>Machine(bool debug)</STRONG>
+<DD> The <EM>Machine</EM> constructor takes a
+single argument <EM>debug</EM>. When <EM>debug</EM> is TRUE, the MIPS
+simulator executes instructions in single step mode, invoking the
+debugger after each instruction is executed.  The debugger allows one
+to interactively examine machine state to verify (for instance) that
+registers or memory contain expected values.
+<P>
+By default, single-stepping is disabled.  It is enabled by specifying
+the ``-s'' command line option when starting Nachos up.
+<P>
+<DT><STRONG>ExceptionType Translate(int virtAddr, int* physAddr, int size,
+bool writing)</STRONG>
+<DD> converts virtual address <EM>virtAddr</EM> into its
+corresponding physical address <EM>physAddr</EM>. <EM>Translate</EM>
+examines the machine's translation tables (described in detail in
+Section&nbsp;<A HREF="node7.html#hardwarevm">2.4</A>) in order to perform the translation.  When
+successful, <EM>Translate</EM> returns the corresponding physical
+address in <EM>physAddr</EM>. Otherwise, it returns a code indicating
+the reason for the failure (e.g., page fault, protection violation,
+etc.) Whenever a translation fails, the MIPS simulator invokes the
+Nachos routine <EM>RaiseException</EM> to deal with the problem.  <EM>
+RaiseException</EM> is responsible for handling all hardware trap
+conditions. When <EM>RaiseException</EM> returns, the Nachos <EM>
+Machine</EM> assumes that the condition has been corrected an resumes
+its fetch-execute cycle.
+<P>
+Note that from a user-level process's perspective, traps take place in
+the same way as if the program were executing on a bare machine; a
+trap handler is invoked to deal with the problem.  However, from the
+Nachos perspective, <EM>RaiseException</EM> is called via a normal
+procedure call by the MIPS simulator.
+<P>
+<DT><STRONG>OneInstruction()</STRONG>
+<DD> does the actual work of executing an
+instruction. It fetches the current instruction address from the PC
+register, fetches it from memory, decodes it, and finally executes it.
+Any addresses referenced as part of the fetch/execute cycle (including
+the instruction address given by PCReg) are translated into physical
+addresses via the <EM>Translate()</EM> routine before physical memory
+is actually accessed.
+<P>
+<DT><STRONG>Run()</STRONG>
+<DD> ``turns on'' the MIPS machine, initiating
+the fetch-execute cycle.  This routine should only be called after
+machine registers and memory have been properly initialized.  It
+simply enters an infinite fetch-execute loop.
+<P>
+The main loop in <EM>Run</EM> does three things: 1) it invokes <EM>
+OneInstruction</EM> to actually execute one instruction, 2) it invokes
+the debugger, if the user has requested single-step mode on the
+command line, and 3) it increments a simulated clock after each
+instruction.  The clock, which is used to simulate interrupts, is
+discussed in the following section.
+<DT><STRONG>int ReadRegister(int num)</STRONG>
+<DD> fetches the value stored in register
+<EM>num</EM>.
+<DT><STRONG>void WriteRegister(int num, int value)</STRONG>
+<DD> places <EM>value</EM>
+into register <EM>num</EM>.
+<DT><STRONG>bool ReadMem(int addr, int size, int* value)</STRONG>
+<DD> Retrieves 1, 2,
+or 4 bytes of memory at virtual address <EM>addr</EM>. Note that <EM>
+addr</EM> is the virtual address of the <B>currently</B> <B>
+executing</B> <B>user-level program</B>; <EM>ReadMem</EM> invokes <EM>
+Translate</EM> before it accesses physical memory.
+<P>
+One point that should be noted is that <EM>ReadMem</EM> fails
+(returning FALSE), if the address translation fails (for whatever
+reason).  Thus, if the page is not present in physical memory, <EM>
+ReadMem</EM> fails.  <EM>ReadMem</EM> does <B>not</B> distinguish temporary
+failures (e.g., page not in memory) from hard errors (e.g., invalid
+virtual address)<A NAME="tex2html1" HREF="footnode.html#682"><IMG  ALIGN=BOTTOM ALT="gif" SRC="http://www.cs.duke.edu/icons/latex/foot_motif.gif"></A>.
+<P>
+<EM>ReadMem</EM> is used (for instance) when dereferencing arguments to
+system calls.
+<P>
+<DT><STRONG>bool WriteMem(int addr, int size, int value)</STRONG>
+<DD> writes 1, 2, or 4
+bytes of <EM>value</EM> into memory at virtual address <EM>addr.</EM>
+The same warnings given for <EM>ReadMem</EM> apply here as well.
+<P>
+ </DL><HR><A NAME="tex2html136" HREF="node5.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html134" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html128" HREF="node3.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html138" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html137" HREF="node5.html">Interrupt Management</A>
+<B>Up:</B> <A NAME="tex2html135" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html129" HREF="node3.html">Nachos Machine</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

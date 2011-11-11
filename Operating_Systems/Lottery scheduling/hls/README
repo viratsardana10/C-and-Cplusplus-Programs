@@ -1,0 +1,147 @@
+Lottery Scheduling for FreeBSD 2.2.5R
+-------------------------------------
+
+/*
+ * Copyright (c) 1996,1997,1998,1999 Carnegie Mellon University.
+ * All rights reserved.
+ *
+ * Permission to use, copy, modify and distribute this software and
+ * its documentation is hereby granted, provided that both the copyright
+ * notice and this permission notice appear in all copies of the
+ * software, derivative works or modified versions, and any portions
+ * thereof, and that both notices appear in supporting documentation.
+ *
+ * CARNEGIE MELLON ALLOWS FREE USE OF THIS SOFTWARE IN ITS "AS IS"
+ * CONDITION.  CARNEGIE MELLON DISCLAIMS ANY LIABILITY OF ANY KIND
+ * FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE USE OF THIS SOFTWARE.
+ *
+ * Carnegie Mellon requests users of this software to return to
+ *
+ *  Software Distribution Coordinator  or  Software.Distribution@CS.CMU.EDU
+ *  School of Computer Science
+ *  Carnegie Mellon University
+ *  Pittsburgh PA 15213-3890
+ *
+ * any improvements or extensions that they make and grant Carnegie Mellon the
+ * rights to redistribute these changes.
+ */
+
+Send feedback and questions to David Petrou, dpetrou@cs.cmu.edu.
+
+These files were last modified on 1999/04/24.
+
+Here is the abstract to USENIX '99 paper entitled "Implementing
+Lottery Scheduling: Matching the Specializations in Traditional
+Schedulers" by David Petrou, John W. Milford, and Garth A. Gibson
+describing the scheduler in this archive:
+
+    We describe extensions to lottery scheduling, a proportional-share
+    resource management algorithm, to provide the performance
+    assurances present in traditional non-real time process
+    schedulers.  Lottery scheduling enables flexible control over
+    relative process execution rates with a ticket abstraction and
+    provides load insulation among groups of processes using
+    currencies.  We first show that a straightforward implementation
+    of lottery scheduling does not provide the responsiveness for a
+    mixed interactive and CPU-bound workload offered by the decay
+    usage priority scheduler of the FreeBSD operating system.
+    Moreover, standard lottery scheduling ignores kernel priorities
+    used in the FreeBSD scheduler to reduce kernel lock contention.
+
+    In this paper, we show how to use dynamic ticket adjustments to
+    incorporate into a lottery scheduler the specializations present
+    in the FreeBSD scheduler to improve interactive response time and
+    reduce kernel lock contention.  We achieve this while maintaining
+    lottery scheduling's flexible control over relative execution
+    rates and load insulation.  In spite of added scheduling overhead,
+    the throughput of CPU-bound workloads under our scheduler is
+    within one percent of the FreeBSD scheduler for all but one test.
+    We describe our design, evaluate our implementation, and relate
+    our experience in deploying our hybrid lottery scheduler on
+    production machines.
+
+The complete paper and this archive can be found off of:
+http://www.cs.cmu.edu/~dpetrou/
+
+The process scheduler in this archive is based on Carl Waldspurger's
+lottery scheduling algorithm described in:
+  Carl A. Waldspurger and William E. Weihl.  Lottery Scheduling:
+  Flexible Proportional-Share Resource Management, Proceedings of the
+  First Symposium on Operating Systems Design and Implementation (OSDI
+  '94), pages 1-11, Monterey, California, November 1994.
+  http://www.research.digital.com/SRC/personal/caw/papers.html
+  Received award for best paper.
+
+-----------------------------------------------------------------------------
+
+How to use
+----------
+
+The patch is in this directory.
+New kernel files are in sys/.
+Userlevel programs are in userlevel/.
+
+Make sure "options LOTTERY" is in i386/conf/<YOUR_KERNEL_CONFIG_FILE>
+to enable lottery scheduling.
+
+Use "patch" to apply the patch.  This patch was created with:
+
+diff -c -r --exclude=compile --exclude='PARTITA*' --exclude=init_sysent.c --exclude=syscalls.c --exclude=syscall-hide.h --exclude=syscall.h --exclude=sysproto.h /sys/ ~/lottery/sys/ > ! ~/lottery/PATCHES/lottery_0.6_diff
+
+(PARTITA is the name of my machine.)
+
+Copy the kernel files to the right places in your kernel tree.  Make
+sure to run "sh makesyscalls.sh syscalls.master" in your kern/
+directory.  Reconfigure and rebuild your kernel.
+
+Make a link like "ln -s /sys/sys/lottery.h /usr/include/sys/lottery.h".
+
+Remake and install the programs in userlevel/ if you desire.  If
+anyone rewrites the makefiles to follow BSD convention or writes
+manpages for these programs, please send them to me.
+
+-----------------------------------------------------------------------------
+
+My "to do" list
+---------------
+
+Clean up code.
+
+References to CNR are to the lott_choose_next_runner() function.
+
+There are some splhigh()/splx()'s in the code that are probably not
+necessary and are just slowing things down.  See user_find() and
+proc_find() for example.
+
+We disable the sysctl option to change the time slice length so that
+the conditions stated in CNR hold.  Consider allowing the quantum to
+be adjusted down or up within stricter limits.
+
+"scheduler" (swapper) in vm/vm_glue.c uses p_nice to determine which
+process to swap in.  Should this be something else now?
+
+We add a bunch of lines here and there (some currently commented in,
+and some commented out) throughout the kernel to profile the
+scheduler.  They are in userret() in i386/i386/trap.c, statclock() in
+kern/kern_clock.c, roundrobin() in kern/kern_synch.c, wakeup() in
+kern/kern_synch.c, wakeup_one() in kern/kern_synch.c, mi_switch() in
+kern/kern_synch.c (twice), setrunnable() in kern/kern_synch.c,
+and resetpriority() in kern/kern_synch.c.
+
+Use rdtsc() from cpufunc.h instead of coding the inline asm stuff
+myself.
+
+Security checks fail if we've done a lott_chuser on a process.  This
+is because lproc->uid is a currency, not the user id...  fix by
+decoupling uid from currency.
+
+Restrictions in show_{funding,tickets} can circumvented by users
+making the syscall directly...  :(
+
+We disabled rtprio and idprio functionality.  Rtprio really doesn't
+make sense under the lottery scheduler.  It's not hard to emulate
+idprio though.
+
+-----------------------------------------------------------------------------
+
+[eof]

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>MIPS Architecture</TITLE>
+<META NAME="description" CONTENT="MIPS Architecture">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html511" HREF="node38.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html509" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html503" HREF="node36.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html513" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html512" HREF="node38.html">  About this document </A>
+<B>Up:</B> <A NAME="tex2html510" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html504" HREF="node36.html">Common Errors</A>
+<BR> <P>
+<H1><A NAME="SECTION00080000000000000000">MIPS Architecture</A></H1>
+<P>
+One thing you need to be aware of is that the MIPS architecture (like
+many RISC architectures) has a number of instructions that do not take
+effect right away.  Instructions that fetch values from memory, for
+example, take so long to execute that another instruction (that
+doesn't access memory) can be executed before the memory access
+completes.  Such instructions are called delayed loads; the loaded
+value doesn't become available right away. The MIPS architecture
+executes one instruction during such <EM>load</EM> <EM>delay</EM> <EM>
+slots</EM>.
+<P>
+In many cases, the compiler can rearrange the order of instructions in
+order to fill the delay slot with useful instruction.  For example, a
+value could be loaded a few instructions earlier than it is actually
+needed, as long as the target register was not being used.  When
+tracing programs in Nachos, you should be aware that instructions used
+in calling subroutines have a one-instruction delay.  That is, the PC
+can be changed quickly, but the processor must go to memory to fetch
+the instruction at the new address before it can actually execute it.
+Thus, the code for calling the procedure <EM>Exit</EM> with an argument
+of 0 would be done as follows:
+<P>
+<TT><PRE>        jal        Exit         # Jump to procedure ``Exit''
+        addu        r4,0,0      # r4 &lt;= r0 + 0 (r0 always has a value of 0)</PRE></TT>
+<P>
+That is, the instruction that zeroes out register r4 appears <EM>
+after</EM> the ``jal'' instruction, rather than before as expected.
+<P>
+Table&nbsp;<A HREF="#instructionstable"><IMG  ALIGN=BOTTOM ALT="gif" SRC="http://www.cs.duke.edu/icons/latex/cross_ref_motif.gif"></A> describes some common instructions you
+may encounter.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

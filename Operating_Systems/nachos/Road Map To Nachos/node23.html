@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>SynchDisk</TITLE>
+<META NAME="description" CONTENT="SynchDisk">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html354" HREF="node24.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html352" HREF="node22.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html346" HREF="node22.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html356" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html355" HREF="node24.html">FileSystem Object</A>
+<B>Up:</B> <A NAME="tex2html353" HREF="node22.html">Nachos Filesystem</A>
+<B> Previous:</B> <A NAME="tex2html347" HREF="node22.html">Nachos Filesystem</A>
+<BR> <P>
+<H2><A NAME="SECTION00061000000000000000">SynchDisk</A></H2>
+<P>
+The <EM>SynchDisk</EM> object resides above the raw disk, providing a
+cleaner interface to its services. Specifically, it provides
+operations that block the calling thread until <EM>after</EM> the
+corresponding I/O complete interrupt takes place. In contrast, the
+<EM>Disk</EM> object provides the mechanism for initiating an I/O
+operation, but does not provide a convenient way of blocking the
+caller until the request completes.  In addition, <EM>SynchDisk</EM>
+provides mutual exclusion, so that multiple threads can safely call
+the <EM>SynchDisk</EM> routines concurrently (recall that <EM>Disk</EM>
+cannot service more than one request at a time).  Rather than using
+the <EM>Disk</EM> object directly, most applications will find it
+appropriate to use <EM>SynchDisk</EM> instead.  <EM>SynchDisk</EM>
+provides the following operations:
+<P>
+<DL ><DT><STRONG>SynchDisk(char *name):</STRONG>
+<DD>  Constructor takes the name of Unix
+file  that holds the disk's contents.
+<P>
+This routine is called once at system ``boot time'' (e.g., as part of
+Nachos initialization process in <EM>system.cc</EM>), and it uses the
+Unix file ``DISK'' as its backing store. The <EM>SynchDisk</EM> object
+can be accessed through the global variable <EM>synchDisk</EM>.
+<P>
+<DT><STRONG>RequestDone():</STRONG>
+<DD> Interrupt service routine the underlying <EM>
+Disk</EM> object calls when an I/O operation completes. Simply issues
+the semaphore <EM>V</EM> operation.
+<P>
+<DT><STRONG>ReadSector(int sectorNumber, char *data):</STRONG>
+<DD> Acquire a mutual
+exclusion lock, invoke the underlying <EM>Disk::ReadSector</EM>
+operation and then wait on the semaphore that <EM>RequestDone</EM>
+signals when the I/O operation completes.
+<P>
+<DT><STRONG>WriteSector(int sectorNumber, char *data):</STRONG>
+<DD> Acquire a mutual
+exclusion lock, invoke the underlying <EM>Disk::WriteSector</EM>
+operation and then wait on the semaphore that <EM>RequestDone</EM>
+signals when the I/O operation completes.
+<P>
+ </DL><BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

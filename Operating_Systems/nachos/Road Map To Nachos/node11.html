@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Disk Device</TITLE>
+<META NAME="description" CONTENT="Disk Device">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html211" HREF="node12.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html209" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html205" HREF="node10.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html213" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html212" HREF="node12.html">Nachos Threads</A>
+<B>Up:</B> <A NAME="tex2html210" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html206" HREF="node10.html">Console Device</A>
+<BR> <P>
+<H2><A NAME="SECTION00036000000000000000">Disk Device</A></H2>
+<P>
+<A NAME="rawdisk">&#160;</A>
+The <EM>Disk</EM> object simulates the behavior of a real disk.  The
+disk has only a single platter, with multiple tracks containing
+individual sectors. Each track contains the same number of sectors,
+and blocks are uniquely identified by their sector number.  As with a
+real disk, the OS initiates operations to read or write a specific
+sector, and a later interrupt indicates when the operation has
+actually completed.  The Nachos disk allows only one pending operation
+at a time; the OS may initiate new operations only when the device is
+idle.  Note that it is the responsibility of the OS to insure that
+new requests are not issued while the disk is busy servicing an
+earlier request.
+<P>
+In order to simulate typical delays in accessing a disk, the Nachos
+<EM>Disk</EM> object dynamically varies the time between the initiation
+of an I/O operation and its corresponding I/O complete interrupt.  The
+actual delay depends on how long it takes to move the disk head from
+its previous location to the new track, as well as the rotational
+delay encountered waiting for the desired block to rotate under the
+read/write head.
+<P>
+The simulated disk contains <EM>NumTracks</EM> (32) tracks, each
+containing <EM>SectorsPerTrack</EM> (32) sectors. Individual sectors
+are <EM>SectorSize</EM> (128) bytes in size.  In addition, <EM>Disk</EM>
+contains a ``track buffer'' cache. Immediately after seeking to a new
+track, the disk starts reading sectors, placing them in the track
+buffer. That way, a subsequent read request may find the data already
+in the cache reducing access latency.
+<P>
+The <EM>Disk</EM> object supports the following operations:
+<DL ><DT><STRONG>Disk(char *name, VoidFunctionPtr callWhenDone, int callArg):</STRONG>
+<DD>
+This constructor assumes that the simulated disk is kept in the Unix
+file called <EM>name</EM>.  If the file does not already exist, Nachos
+creates it and writes a ``magic number'' of 0x456789ab into the
+initial four bytes.  The presence of a magic number allows Nachos to
+distinguish a file containing a Nachos simulated disk from one
+containing something else. Finally, Nachos insures that the rest of
+the file contains NULL sectors.  All Nachos disks have the same size,
+given by the formula  <IMG WIDTH=274 HEIGHT=27 ALIGN=MIDDLE ALT="tex2html_wrap_inline1021" SRC="img3.gif"  > .
+<P>
+If the file already exists, Nachos reads the first 4 bytes to verify
+that they contain the expected Nachos ``magic number,'' terminating if
+the check fails.  Note that by default the contents of a Nachos disk
+is preserved across multiple Nachos sessions, allowing users to create
+a Nachos file in one session, and read it in another. However, if the
+disk contains a file system, and the file system is left in a
+corrupted state by a previous Nachos session, subsequent Nachos
+invocations are likely run into problems if they don't first verify
+that the filesystem data structures are logically consistent.
+<P>
+The last two constructor arguments are used to provide an ``I/O
+complete'' interrupt mechanism.  Specifically, the Nachos machine
+signals the completion of a Disk operation (e.g., read or write) by
+invoking the procedure <EM>callWhenDone</EM>, passing it an argument of
+<EM>callArg</EM>.  As shown below, the <EM>SynchDisk</EM> object uses
+this routine to wake up a thread that has been suspended while waiting
+for I/O to complete.
+<P>
+<DT><STRONG>ReadRequest(int sectorNumber, char *data):</STRONG>
+<DD> Is invoked to read
+the specified sector number into the buffer <EM>data</EM>. In Nachos,
+all sectors are the same size (<EM>SectorSize</EM>).
+<P>
+Note that this operations returns immediately, <EM>before</EM> the
+transfer actually takes place.  <EM>ReadRequest</EM> schedules an
+interrupt to take place sometime in the future, after a time roughly
+dependent on the seek distance needed to complete the operation. Only
+after the interrupt takes place is it correct to start using the data.
+<P>
+<DT><STRONG>WriteRequest(int sectorNumber, char *data):</STRONG>
+<DD> Similar to <EM>
+ReadRequest</EM>, except that it writes a single sector.
+<P>
+<DT><STRONG>ComputeLatency(int newSector, bool writing):</STRONG>
+<DD> estimates the
+latency required to access the block <EM>newSector</EM> given the
+current position of the disk head. The routine is used in deciding
+when to schedule an I/O complete interrupt when servicing a read or
+write request.
+<P>
+ </DL><HR><A NAME="tex2html211" HREF="node12.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html209" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html205" HREF="node10.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html213" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html212" HREF="node12.html">Nachos Threads</A>
+<B>Up:</B> <A NAME="tex2html210" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html206" HREF="node10.html">Console Device</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

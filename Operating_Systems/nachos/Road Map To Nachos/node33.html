@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Multiprogramming</TITLE>
+<META NAME="description" CONTENT="Multiprogramming">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html469" HREF="node34.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html467" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html461" HREF="node32.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html471" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html470" HREF="node34.html">Virtual Memory</A>
+<B>Up:</B> <A NAME="tex2html468" HREF="node30.html">Experience With Nachos Assignments</A>
+<B> Previous:</B> <A NAME="tex2html462" HREF="node32.html">Synchronization</A>
+<BR> <P>
+<H2><A NAME="SECTION00073000000000000000">Multiprogramming</A></H2>
+<P>
+<OL><LI> The Nachos <EM>Fork</EM> and <EM>Exec</EM> routines have
+completely different semantic from the Unix system calls. In
+particular, the Nachos system calls do the following:
+<DL ><DT><STRONG>Exec</STRONG>
+<DD> Creates a new address space, reads a binary program into
+it, and then creates a new thread (via <EM>Thread::Fork</EM>) to run
+it.  Note that in Unix separate <EM>fork</EM> and <EM>exec</EM> system
+calls are needed to achieve the same result.<A NAME="tex2html9" HREF="footnode.html#594"><IMG  ALIGN=BOTTOM ALT="gif" SRC="http://www.cs.duke.edu/icons/latex/foot_motif.gif"></A>
+<DT><STRONG>Fork</STRONG>
+<DD> Creates a new thread of control executing in an existing
+address space.  This is a non-trivial system call to implement (for
+reasons discussed later).
+<P>
+ </DL><LI> When a Nachos program issues an <EM>Exec</EM> system call, the
+parent process is executing the code associated with the <EM>Exec</EM>
+call.  At some point during the <EM>Exec</EM> call, the parent will
+need to invoke <EM>Thread::Fork</EM> to create the new thread that
+executes the child process. Careful thought is required in deciding at
+what point the <EM>Fork</EM> operation should be done. Specifically,
+after <EM>Fork</EM>, the (new) child thread can no longer access
+variables associated with the parent process. For example, if the
+parent copies the name of the new file to be executed into a variable,
+then issues a <EM>Fork</EM>, expecting the child to open that file, a
+race condition exists. If the child runs <EM>after</EM> the parent, the
+parent may already have deleted (or changed) the variable holding that
+file name.
+<P>
+The above race condition appears in a number of similar contexts where
+two processes exchange data. The problem is that the parent and child
+threads need to synchronize with each other, so that the parent
+doesn't reclaim or reuse memory before the child is finished accessing
+it.<LI> When the MIPS simulator ``traps'' to Nachos via the <EM>
+RaiseException</EM> routine, the program counter (PCReg) points point to
+the instruction that caused the trap. That is, the PCReg will not have
+been updated to point to the next instruction.  This is the correct
+behavior. When the fault is due to (say) a page missing, for example,
+the faulting instruction will need be re-executed after the missing
+page is brought into memory. If PCReg had already been updated, there
+would be no way of knowing which instruction to re-execute.
+<P>
+On the other hand, when a user program invokes a system call via the
+``syscall'' instruction, re-executing that instruction after returning
+from the system call leads to an infinite system call loop.  Thus, as
+part of executing a system call, the exception handler code in Nachos
+needs to update PCReg to point to the instruction following the
+``syscall'' instruction.  Updating PCReg is not as trivial as first
+seems, however, due to the possibility of delayed branches.  The
+following code properly updates the program counter.  In particular,
+not properly updating NextPCReg can lead to improper execution.
+<TT><PRE>	pc = machine-&gt;ReadRegister(PCReg);
+	machine-&gt;WriteRegister(PrevPCReg, pc);
+	pc = machine-&gt;ReadRegister(NextPCReg);
+	machine-&gt;WriteRegister(PCReg, pc);
+	pc += 4;
+	machine-&gt;WriteRegister(NextPCReg, pc);</PRE></TT>
+<P>
+Use of the following test programs greatly helped convince me that
+my implementation was (finally) correct:
+<P>
+<DL ><DT><STRONG>ConsoleA</STRONG>
+<DD> Simple program that simply loops, writing the
+character 'A' to the console. Likewise, <EM>ConsoleB</EM> loops,
+printing the character 'B'.
+<P>
+<DT><STRONG>shell</STRONG>
+<DD>  The provided shell starts a process and then issues a
+``Join'' to wait for it to terminate.  This test multiprogramming in a
+very rudimentary fashion only, because the  shell and the invoked
+program rarely execute concurrently in practice.
+<P>
+Modify the shell so that it can run jobs in background.  For example,
+if the first character of the file is an ``&amp;'', start the process as
+normal, but don't invoke a ``Join.'' Instead, prompt the user for the
+next command.
+<P>
+With the modified shell, run the <EM>ConsoleA</EM> and <EM>ConsoleB</EM>
+programs concurrently.
+<P>
+ </DL></OL><HR><A NAME="tex2html469" HREF="node34.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html467" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html461" HREF="node32.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html471" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html470" HREF="node34.html">Virtual Memory</A>
+<B>Up:</B> <A NAME="tex2html468" HREF="node30.html">Experience With Nachos Assignments</A>
+<B> Previous:</B> <A NAME="tex2html462" HREF="node32.html">Synchronization</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

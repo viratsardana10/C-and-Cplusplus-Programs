@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>User-Level Processes</TITLE>
+<META NAME="description" CONTENT="User-Level Processes">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html279" HREF="node18.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html277" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html271" HREF="node16.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html281" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html280" HREF="node18.html">Process Creation</A>
+<B>Up:</B> <A NAME="tex2html278" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html272" HREF="node16.html">Special Notes</A>
+<BR> <P>
+<H1><A NAME="SECTION00050000000000000000">User-Level Processes</A></H1>
+<P>
+<A NAME="userlevel">&#160;</A>
+Nachos runs user programs in their own private address space. Nachos
+can run any MIPS binary, assuming that it restricts itself to only
+making system calls that Nachos understands. In Unix, ``a.out'' files
+are stored in ``coff'' format. Nachos requires that executables be in
+the simpler ``Noff'' format. To convert binaries of one format to the
+other, use the <EM>coff2noff</EM> program.  Consult the <EM>
+Makefile</EM> in the <EM>test</EM> directory for details.
+<P>
+Noff-format files consist of four parts. The first part, the Noff
+header, describes the contents of the rest of the file, giving
+information about the program's instructions, initialized variables
+and uninitialized variables.
+<P>
+The Noff header resides at the very start of the file and contains
+pointers to the remaining sections. Specifically, the Noff header
+contains:
+<DL ><DT><STRONG>noffMagic</STRONG>
+<DD> A reserved ``magic'' number that indicates that the
+file is in Noff format. The magic number is stored in the first four
+bytes of the file. Before attempting to execute a user-program, Nachos
+checks the magic number to be sure that the file about to be executed
+is actually a Nachos executable.
+<P>
+For each of the remaining sections, Nachos maintains the following
+information:  
+<DL ><DT><STRONG>virtualAddr</STRONG>
+<DD> What virtual address that segment begins at
+(normally zero).
+<DT><STRONG>inFileAddr</STRONG>
+<DD> Pointer within the Noff file where that section
+actually begins (so that Nachos can read it into memory before
+execution begins).
+<DT><STRONG>size</STRONG>
+<DD> The size (in bytes) of that segment.
+<P>
+ </DL> 
+ </DL>
+<P>
+When executing a program, Nachos creates an address space and copies
+the contents of the instruction and initialized variable segments into
+the address space. Note that the uninitialized variable section does
+not need to be read from the file.  Since it is defined to contain all
+zeros, Nachos simply allocates memory for it within the address space
+of the Nachos process and zeros it out.
+<P>
+<BR> <HR>
+<UL> 
+<LI> <A NAME="tex2html282" HREF="node18.html#SECTION00051000000000000000">Process Creation</A>
+<LI> <A NAME="tex2html283" HREF="node19.html#SECTION00052000000000000000">Creating a Noff Binary</A>
+<LI> <A NAME="tex2html284" HREF="node20.html#SECTION00053000000000000000">System Calls and Exception Handling</A>
+<LI> <A NAME="tex2html285" HREF="node21.html#SECTION00054000000000000000">Execution Trace of User-Level Process</A>
+</UL>
+<HR><A NAME="tex2html279" HREF="node18.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html277" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html271" HREF="node16.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html281" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html280" HREF="node18.html">Process Creation</A>
+<B>Up:</B> <A NAME="tex2html278" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html272" HREF="node16.html">Special Notes</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

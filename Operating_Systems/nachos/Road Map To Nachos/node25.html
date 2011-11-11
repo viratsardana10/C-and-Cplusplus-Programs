@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>OpenFile Object</TITLE>
+<META NAME="description" CONTENT="OpenFile Object">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html376" HREF="node26.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html374" HREF="node22.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html368" HREF="node24.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html378" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html377" HREF="node26.html">File System Physical Representation</A>
+<B>Up:</B> <A NAME="tex2html375" HREF="node22.html">Nachos Filesystem</A>
+<B> Previous:</B> <A NAME="tex2html369" HREF="node24.html">FileSystem Object</A>
+<BR> <P>
+<H2><A NAME="SECTION00063000000000000000">OpenFile Object</A></H2>
+<P>
+<A NAME="openfile">&#160;</A>
+The <EM>OpenFile</EM> object manages the details of accessing the
+contents of a specific file.  Opening a file for access returns a
+pointer to an <EM>OpenFile</EM> object that can be used in subsequent
+read and write operations.  Each <EM>OpenFile</EM> object has an
+associated read/write mark that keeps track of where the previous read
+or write operation ended. Supported operations include:
+<P>
+<DL ><DT><STRONG>OpenFile(int sector)</STRONG>
+<DD> opens the file <EM>sector</EM>. Argument
+<EM>sector</EM> is the sector number containing the <EM>FileHeader</EM>
+for the file. A <EM>FileHeader</EM> (discussed in detail below) is
+similar to a Unix <EM>inode</EM> in that the low-level file system
+routines know nothing about file names; files are uniquely identified
+by there <EM>FileHeader</EM> number.  <EM>OpenFile</EM> returns a
+pointer to an <EM>OpenFile</EM> object that is subsequently used to
+invoke any of remaining operations.
+<DT><STRONG>int ReadAt(char *into, int numBytes, int position)</STRONG>
+<DD> copies <EM>
+numBytes</EM> of data into the buffer <EM>into</EM>. Argument <EM>
+position</EM> specifies at what offset within the file reading is to
+start. ReadAt returns the
+number of bytes successfully read.
+<DT><STRONG>int Read(char *into, int numBytes)</STRONG>
+<DD> simply invokes <EM>ReadAt</EM>,
+passing it the current read/write mark. <EM>Read</EM>
+is used to read the file sequentially from start to finish, letting
+keeping track of which part of the file has already been read, and at
+what offset the next read operation is to continue. Read returns the
+number of bytes successfully read.
+<P>
+<DT><STRONG>int WriteAt(char *from, int numBytes, int position)</STRONG>
+<DD> copies <EM>
+numBytes</EM> of data from the buffer <EM>from</EM> to the open file,
+starting <EM>position</EM> bytes from the start of the file. <EM>
+WriteAt</EM> returns the number of bytes actually written.
+<P>
+<DT><STRONG>int Write(char *from, int numBytes)</STRONG>
+<DD> is used to write a file
+sequentially. The first <EM>Write</EM> begins at the start of the file,
+with subsequent writes beginning where the previous operation ended.
+Write returns the number of bytes actually written.
+<DT><STRONG>int Length()</STRONG>
+<DD> returns the actual size of the file.
+<P>
+ </DL><HR><A NAME="tex2html376" HREF="node26.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html374" HREF="node22.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html368" HREF="node24.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html378" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html377" HREF="node26.html">File System Physical Representation</A>
+<B>Up:</B> <A NAME="tex2html375" HREF="node22.html">Nachos Filesystem</A>
+<B> Previous:</B> <A NAME="tex2html369" HREF="node24.html">FileSystem Object</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

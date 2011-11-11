@@ -1,0 +1,9 @@
+# 1 "func.cpp"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "func.cpp"
+extern int j;
+int func(int x)
+{
+ return x*j;
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Console Device</TITLE>
+<META NAME="description" CONTENT="Console Device">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html202" HREF="node11.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html200" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html194" HREF="node9.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html204" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html203" HREF="node11.html">Disk Device</A>
+<B>Up:</B> <A NAME="tex2html201" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html195" HREF="node9.html">Software Managed TLB</A>
+<BR> <P>
+<H2><A NAME="SECTION00035000000000000000">Console Device</A></H2>
+<P>
+Nachos provides a terminal console device and a single disk
+device. Nachos devices are accessed through low-level primitives that
+simply initiate an I/O operation. The operation itself is performed
+later, with an ``operation complete'' interrupt notifying Nachos when
+the operation has completed.
+<P>
+The <EM>Console</EM> class simulates the behavior of a
+character-oriented CRT device.  Data can be written to the device one
+character at a time through the <EM>PutChar()</EM> routine.  When a
+character has successfully been transmitted, a ``transmit complete''
+interrupt takes place and the user-supplied handler is invoked.  The
+interrupt handler presumably checks if more characters are waiting to
+be output, invoking <EM>PutChar</EM> again if appropriate.
+<P>
+Likewise, input characters arrive one-at-a-time. When a new character
+arrives, the console device generates an interrupt and the
+user-supplied input interrupt service routine is invoked to retrieve
+the character from the device and (presumably) place it into a buffer
+from which higher-level routines (e.g., <EM>GetChar()</EM>) can
+retrieve it later.
+<P>
+The <EM>Console</EM> object supports the following operations:
+<DL ><DT><STRONG>Console(char *readFile, char *writeFile, VoidFunctionPtr
+readAvail, VoidFunctionPtr writeDone, int callArg)</STRONG>
+<DD> The constructor
+creates an instance of a terminal console.  Argument <EM>readFile</EM>
+contains the Unix file name of where the data is to be read from; if
+NULL, standard input is assumed. Likewise, argument <EM>writeFile</EM>
+indicates where output written to the console is to go; if NULL,
+standard output is assumed. When a character becomes available for
+reading, <EM>readAvail</EM> is invoked with an argument of <EM>
+callArg</EM> to notify the Nachos that a character is available.  The
+character itself is retrieved by calling <EM>
+Console::GetChar()</EM>. Upon return, it is assumed that the character
+has been retrieved and when the next one arrives, <EM>readAvail</EM>
+will be called again.
+<P>
+<DT><STRONG>void PutChar(char ch)</STRONG>
+<DD> Writes character <EM>ch</EM> to the
+output device. Once output has started, it is an error to invoke <EM>
+PutChar()</EM> again <EM>before</EM> the corresponding I/O complete
+interrupt has taken place.  Once the console device has written the
+character to the device, it invokes the user-supplied procedure <EM>
+writeDone</EM> , passing it <EM>callArg</EM> as an argument.
+<P>
+<DT><STRONG>char GetChar()</STRONG>
+<DD> Retrieves a character from the console.  <EM>
+GetChar</EM> returns EOF if no new data is available.  Normally, the
+user would not invoke <EM>GetChar</EM> unless the availability of new
+data had first been signalled via the <EM>readAvail()</EM> interrupt
+service routine.
+<P>
+<DT><STRONG>void CheckCharAvail()</STRONG>
+<DD> an internal procedure used to see if new
+data is available for reading.
+<P>
+ </DL>
+<P>
+When a console device is created by the constructor, the appropriate
+Unix files (or stdin/stdout) are opened and a timer event is scheduled
+to take place 100 time units in the future.  When the timer expires,
+the routine <EM>CheckCharAvail</EM> is invoked to see if any data is
+present.  If so, <EM>CheckCharAvail</EM> reads that character and
+invokes the user-supplied input interrupt handler <EM>readAvail.</EM>
+It then schedules a new timer event so that the process repeats every
+100 time units.  Thus, <EM>CheckCharAvail</EM> simply polls every 100
+clock ticks for new data, calling the interrupt service routine whenever
+data is present for processing.
+<P>
+Device output is initiated by calling <EM>PutChar</EM>, giving it a
+single character to output.  Once character output has been initiated,
+the device is made busy until the output complete interrupt takes
+place.  <EM>PutChar</EM> simply outputs the one character, sets an
+internal flag to indicate that the device is busy, and then schedules
+a timer interrupt to take place 100 clock ticks later.  When the timer
+expires, the state of the device is changed from busy to idle, and the
+user-supplied output interrupt complete routine is invoked. This
+routine would presumably invoke <EM>PutChar</EM> if additional output
+characters were queued awaiting output.
+<P>
+<HR><A NAME="tex2html202" HREF="node11.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html200" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html194" HREF="node9.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html204" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html203" HREF="node11.html">Disk Device</A>
+<B>Up:</B> <A NAME="tex2html201" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html195" HREF="node9.html">Software Managed TLB</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

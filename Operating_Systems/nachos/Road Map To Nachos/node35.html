@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>File System</TITLE>
+<META NAME="description" CONTENT="File System">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html491" HREF="node36.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html489" HREF="node30.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html483" HREF="node34.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html493" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html492" HREF="node36.html">Common Errors</A>
+<B>Up:</B> <A NAME="tex2html490" HREF="node30.html">Experience With Nachos Assignments</A>
+<B> Previous:</B> <A NAME="tex2html484" HREF="node34.html">Virtual Memory</A>
+<BR> <P>
+<H2><A NAME="SECTION00075000000000000000">File System</A></H2>
+<P>
+Locking is a major pain because <EM>WriteAt</EM> calls <EM>ReadAt</EM>
+(on occasion). One probably wants to lock for both reads and writes,
+but if one already has the lock (while writing) and then calls read,
+potential deadlock scenarios appear immediately. Here are some
+particularly tricky cases:
+<OL><LI> It is tempting to have a single lock per file, which one
+acquires as the first step in beginning a read or write.  However,
+there are cases where <EM>WriteAt</EM> also calls <EM>
+ReadAt</EM>. Specifically, if <EM>WriteAt</EM> needs to write a partial
+sector, it must first read the sector and then update the subset of
+that sector the <EM>WriteAt</EM> refers to.  However, if <EM>ReadAt</EM>
+attempts to acquire the same lock that <EM>WriteAt</EM> already holds,
+deadlock results.<LI> Consider updating an directory (as part of create).  To properly
+update the directory, it is read from disk, then modified in memory,
+then written back out to disk.  For correctness, access to the
+directory must be locked for the duration of all operations (not just
+while reading or writing).  Otherwise, two threads could attempt to
+update the directory simultaneously.  If both threads read the
+directory, modified separate in-memory copies and then wrote out the
+changes, only one set of changes would make it out to disk. Note that
+it is insufficient to lock the directory only during the reads and
+writes; a lock must be held across both operations. Thus, acquiring
+locks within <EM>ReadAt</EM> or <EM>WriteAt</EM> is insufficient.<LI> A similar scenario occurs when updating the freelist as part of
+removing a file.  One must first read the bitmap, update it, and then
+flush the changes back out to disk.  The bitmap routines <EM>
+FetchFrom</EM> and <EM>WriteBack</EM> call <EM>ReadAt</EM> and <EM>
+WriteAt</EM> respectively.
+</OL><BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

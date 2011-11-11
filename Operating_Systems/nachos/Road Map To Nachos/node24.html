@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>FileSystem Object</TITLE>
+<META NAME="description" CONTENT="FileSystem Object">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html365" HREF="node25.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html363" HREF="node22.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html357" HREF="node23.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html367" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html366" HREF="node25.html">OpenFile Object</A>
+<B>Up:</B> <A NAME="tex2html364" HREF="node22.html">Nachos Filesystem</A>
+<B> Previous:</B> <A NAME="tex2html358" HREF="node23.html">SynchDisk</A>
+<BR> <P>
+<H2><A NAME="SECTION00062000000000000000">FileSystem Object</A></H2>
+<P>
+Nachos supports two different filesystems, a ``stub'' that simply maps
+Nachos file operations into ones the access Unix files in the current
+directory, and a Nachos file system that users can modify.  Use of the
+stub filesystem makes it possible to implement paging and swapping
+before implementing a Nachos file system.  The <EM>-DFILESYS_STUB</EM>
+compilation flag controls which version gets used.
+<P>
+The <EM>FileSystem</EM> object supports the following operations:
+<P>
+<DL ><DT><STRONG>FileSystem(bool format)</STRONG>
+<DD> For the stub system, this
+constructor (and destructor) does nothing; the Unix file system is
+used instead.  For the Nachos file system, <EM>format</EM> indicates
+whether <EM>FileSystem</EM> should be re-initialized or whether the
+previous contents of the file system (from an earlier Nachos session)
+should be retained.
+<P>
+The <EM>FileSystem</EM> constructor is called once at ``boot time.''
+It assumes that a <EM>synchDisk</EM> instance has already been created
+and uses it to store the file system.
+<P>
+<DT><STRONG>bool Create(char *name, int initialSize)</STRONG>
+<DD> creates a zero-length file
+called <EM>name</EM>. If the file already exists, <EM>Create</EM>
+truncates its contents.  Note that <EM>Create</EM> returns a boolean
+value, either success or failure, but does not actual open a file; it
+simply makes sure that it exists and has zero-length. To actually
+write to a file that has been created, a subsequent call to <EM>
+Open</EM> must be made.
+<P>
+Argument <EM>initialSize</EM> specifies the actual size of the file.
+(Note: <EM>initialSize</EM> is ignored in the stub filesystem; Unix
+doesn't require that a file's maximum size be specified at the time it
+is created.)  For the regular filesystem, specifying the file's size
+at creation time simplifies implementation. Sufficient disk sectors
+can be allocated in advance to hold the entire (potential) file
+contents, and appending data to the file requires nothing more than
+accessing the appropriate blocks. Of course, one possible variation
+for the assignment is to implement extensible files whose actual size
+grows dynamically.
+<P>
+<DT><STRONG>OpenFile *Open(char *name)</STRONG>
+<DD> opens file <EM>name</EM> for subsequent read
+or write access. In the stub file system, <EM>Open</EM> simply opens
+the Unix file for read/write access.  Note that all files opened under
+Nachos are opened with both read and write access.  Thus, the user
+opening the file must have write permission for a file even when the
+file will only be read. One consequence of this can cause confusion
+while implementing multiprogramming. Nachos is unable to <EM>Exec</EM>
+binary files that are not writable because it cannot open them.
+<P>
+Another thing to note is that <EM>Open</EM> does not truncate a file's
+contents (it can't since you might be reading the file).  However,
+when writing a file, it is sometimes the case that the file's existing
+contents should be deleted before new data is written. In Nachos,
+invoking <EM>Create</EM> before <EM>Open</EM> insures that a file is
+zero-length.
+<P>
+<DT><STRONG>bool Remove(char *name)</STRONG>
+<DD> deletes file <EM>name</EM> and frees the
+disk blocks associated with that file.
+<P>
+Note that in Unix, the disk sectors associated with a deleted file are
+not actually returned to the free list as long as there are any
+processes that still have the file open.  Only after all open file
+descriptors for a file are closed does Unix deallocate the disk blocks
+associated with the file and return them to the free list. The Unix
+semantics prevent certain types of undesirable situations. For
+example, deleting a binary file cannot cause processes paging off of
+that file's text segment to terminate unexpectedly when the paging
+system attempts to load an instruction page from non-existent file.
+<P>
+One suggested Nachos assignment is to provide Unix-style file
+deletion.
+<P>
+ </DL><HR><A NAME="tex2html365" HREF="node25.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html363" HREF="node22.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html357" HREF="node23.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html367" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html366" HREF="node25.html">OpenFile Object</A>
+<B>Up:</B> <A NAME="tex2html364" HREF="node22.html">Nachos Filesystem</A>
+<B> Previous:</B> <A NAME="tex2html358" HREF="node23.html">SynchDisk</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

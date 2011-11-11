@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Nachos Filesystem</TITLE>
+<META NAME="description" CONTENT="Nachos Filesystem">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html336" HREF="node23.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html334" HREF="main.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html328" HREF="node21.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html338" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html337" HREF="node23.html">SynchDisk</A>
+<B>Up:</B> <A NAME="tex2html335" HREF="main.html">A Road Map Through </A>
+<B> Previous:</B> <A NAME="tex2html329" HREF="node21.html">Execution Trace of User-Level </A>
+<BR> <P>
+<H1><A NAME="SECTION00060000000000000000">Nachos Filesystem</A></H1>
+<P>
+<A NAME="filesystem">&#160;</A>
+There are two versions of the Nachos filesystem. A ``stub'' version is
+simply a front-end to the Unix filesystem, so that users can access
+files within Nachos without having to write their own file system. The
+second version allows students to implement a filesystem on top of a
+raw disk, which is in fact a regular Unix file that can only be
+accessed through a simulated disk. The simulated disk accesses the
+underlying Unix file exclusively through operations that read and
+write individual sectors.  Both file systems provide the same service
+and interface.
+<P>
+Files are accessed through several layers of objects. At the lowest
+level, a <EM>Disk</EM> object provides a crude interface for initiating
+I/O operations for individual sectors.  Above <EM>Disk</EM>, the <EM>
+SynchDisk</EM> object provides synchronized access to a <EM>Disk</EM>,
+blocking callers until a requested operation actually completes. In
+addition, <EM>SynchDisk</EM> allows multiple threads to safely invoke
+disk operations concurrently.  The <EM>FileSystem</EM> object handles
+creating, deleting, opening and closing individual files.  Sitting
+alongside the <EM>FileSystem</EM>, the <EM>OpenFile</EM> object handles
+the accessing of an individual file's contents, allowing seeks, reads,
+and writes.  The <EM>FileSystem::Open</EM> routine returns a file
+descriptor (actually an <EM>``OpenFile *</EM>''), that is used to
+access the file's data. The raw <EM>Disk</EM> object was described in
+Section&nbsp;<A HREF="node11.html#rawdisk">2.6</A>. The remaining objects are discussed in detail
+below.
+<P>
+<BR> <HR>
+<UL> 
+<LI> <A NAME="tex2html339" HREF="node23.html#SECTION00061000000000000000">SynchDisk</A>
+<LI> <A NAME="tex2html340" HREF="node24.html#SECTION00062000000000000000">FileSystem Object</A>
+<LI> <A NAME="tex2html341" HREF="node25.html#SECTION00063000000000000000">OpenFile Object</A>
+<LI> <A NAME="tex2html342" HREF="node26.html#SECTION00064000000000000000">File System Physical Representation</A>
+<UL> 
+<LI> <A NAME="tex2html343" HREF="node27.html#SECTION00064100000000000000">File Header</A>
+<LI> <A NAME="tex2html344" HREF="node28.html#SECTION00064200000000000000">Directories</A>
+<LI> <A NAME="tex2html345" HREF="node29.html#SECTION00064300000000000000">Putting It All Together</A>
+</UL>
+</UL>
+<BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

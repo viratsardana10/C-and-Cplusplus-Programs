@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Linear Page Tables</TITLE>
+<META NAME="description" CONTENT="Linear Page Tables">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html182" HREF="node9.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html180" HREF="node7.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html174" HREF="node7.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html184" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html183" HREF="node9.html">Software Managed TLB</A>
+<B>Up:</B> <A NAME="tex2html181" HREF="node7.html">Address Translation</A>
+<B> Previous:</B> <A NAME="tex2html175" HREF="node7.html">Address Translation</A>
+<BR> <P>
+<H3><A NAME="SECTION00034100000000000000">Linear Page Tables</A></H3>
+<P>
+With linear tables, the MMU splits a virtual address into page number
+and page offset components. The page number is used to index into an
+array of page table entries.  The actual physical address is the
+concatenation of the page frame number in the page table entry and the
+page offset of the virtual address.
+<P>
+To use linear page tables, one simply initializes variable <EM>
+machine-&gt;pageTable</EM> to point to the page table used to perform
+translations.  In general, each user process will have its own private
+page table. Thus, a process switch requires updating the <EM>
+pageTable</EM> variable. In a real machine, <EM>pageTable</EM> would
+correspond to a special register that would be saved and restored as
+part of the <EM>SWITCH()</EM> operation.  The machine variable <EM>
+pageTableSize</EM> indicates the actual size of the page table.
+<P>
+Page table entries consist of the physical page frame number for the
+corresponding virtual page, a flag indicating whether the entry is
+currently valid (set by the OS, inspected by hardware), a flag
+indicating whether the page may be written (set by OS, inspected by
+hardware), a bit indicating whether the page has been referenced (set
+by the hardware, inspected and cleared by OS) and a dirty bit (set by
+hardware, inspected and cleared by OS).
+<P>
+The Nachos machine has <EM>NumPhysPages</EM> of physical memory
+starting at location <EM>mainMemory</EM>. Thus, page 0 starts at <EM>
+machine-&gt;mainMemory</EM>, while page N starts at  <IMG WIDTH=259 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline1019" SRC="img2.gif"  > .
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

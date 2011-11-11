@@ -1,0 +1,125 @@
+/* CODE: MARCHA4 */
+
+#include <iostream>
+#include <stdio.h>
+#include <cmath>
+#include <iomanip>
+using namespace std;
+
+#define s(x) scanf("%d", &x)
+#define sll(x) scanf("%lld", &x)
+#define p(x) printf("%d", x)
+#define pl(x) printf("%ld", x)
+#define FOR(A,B,C) for(int i = A; i < B; i += C)
+#define ll long long
+#define l long
+
+ll modulo;
+ll modular_exponentiation(ll );
+
+int main()
+{
+	int T;
+	s(T);
+	while(T--)
+	{
+		long long N; 
+		sll(N); 
+		int K; 
+		s(K);
+
+		modulo = 1;
+	  	FOR(0,K,1)
+   			modulo *= 10;
+
+		ll first, last;
+		last = modular_exponentiation(N);
+
+		long double param = (N * log(N))/(log(2) + log(5));
+	
+//		cout << fixed << showpoint << setprecision(8);
+//		cout << param << endl;
+		
+		l double temp;
+		l double fract_part = modf( param, &temp);	
+
+		l double power = pow(10, fract_part);
+//		cout << fract_part << "  " << power << endl;
+		
+		l double digits;
+//		if(K == 9) 
+//			digits = power * modulo;
+//		else 
+		digits = power*(modulo/10);
+
+//		cout << digits << endl;
+//		modf(digits, &temp);
+			
+/*		if( K == 9){
+			int x = temp - (temp/10)*10;
+			temp /= 10;
+			if(x == 9) ++temp;
+		} */
+//		cout << fixed << temp << endl;
+		first = digits + 0.1;
+	
+/*		if( N < 10 )
+		{
+			switch(N)
+			{
+				case 2:
+				++first;
+				break;
+				case 3:
+				if( K == 2) ++first;
+				break;
+				case 4:
+				if( K == 3) ++first;
+				break;
+				case 5:
+				if( K == 4) ++first;
+				break;
+				case 6:
+				if( K == 5) ++first;
+				break;
+				case 7:
+				if( K == 6) ++first;
+				break;
+				case 8:
+				if( K == 8) ++first;
+				case 9:
+				if( K == 9) ++first;
+				break;
+				default:
+				break;
+			}
+		}
+*/
+		printf("%lld ", first);	
+		cout << right << setw(K) << setfill('0') << last;
+		printf("\n");
+
+	} 
+	return 0;
+
+}
+
+ll modular_exponentiation(ll n)
+{
+   ll result = 1;
+   ll power = n;
+
+   while(n)
+   {
+      if(n&1)
+	  {
+          result = (result*power)%modulo;
+	  }
+     	 
+       power=(power*power)%modulo;
+       n >>= 1;
+   }
+
+   return result;
+}
+

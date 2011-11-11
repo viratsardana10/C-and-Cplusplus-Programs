@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Execution Trace of User-Level Process</TITLE>
+<META NAME="description" CONTENT="Execution Trace of User-Level Process">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html325" HREF="node22.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html323" HREF="node17.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html319" HREF="node20.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html327" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html326" HREF="node22.html">Nachos Filesystem</A>
+<B>Up:</B> <A NAME="tex2html324" HREF="node17.html">User-Level Processes</A>
+<B> Previous:</B> <A NAME="tex2html320" HREF="node20.html">System Calls and Exception </A>
+<BR> <P>
+<H2><A NAME="SECTION00054000000000000000">Execution Trace of User-Level Process</A></H2>
+<P>
+Consider the simplest Nachos program, <EM>halt.c,</EM> which invokes
+the ``halt'' system call and does nothing else.  Its source code is
+shown in Figure&nbsp;<A HREF="node21.html#haltcfig">1</A>
+<P><A NAME="684">&#160;</A><A NAME="haltcfig">&#160;</A><IMG ALIGN=BOTTOM SRC="_10375_figure327.gif"><BR>
+<STRONG>Figure 1:</STRONG> Source for the program <EM>halt.c</EM><BR>
+<P>
+<P>
+When compiled, <EM>gcc -S</EM> generates the assembly language code shown
+in figure&nbsp;<A HREF="node21.html#haltsfig">2</A> (line numbers and additional comments have
+been added for clarity). The only instruction that directly relates to
+invoking the ``halt'' system call is given in line 27. The <EM>jal</EM>
+instruction executes a jump that transfers control to the label
+``Halt''. Note that there is no label called ``Halt'' in this program.
+The code for ``Halt'' can be found in the file <EM>start.s</EM>. Lines
+1-21 are assembler directives that don't actually generate any
+instructions.  Lines 22-25 perform the standard procedure call linkage
+operations that are performed as part of starting execution in a new
+subroutine (e.g., saving the return address and allocating space on
+the stack for local variables). Line 26 is a call to a gcc-supplied
+library routine that Unix needs to execute before your program
+normally begins execution (it is not needed in Nachos, so a dummy
+routine is provided that does nothing). Lines 29-33 provide the
+standard code for returning from a procedure call, effectively undoing
+the effects of lines 22-25 (e.g., fetch the saved return address and
+then jump back to it).
+<P>
+<P><A NAME="685">&#160;</A><A NAME="haltsfig">&#160;</A><IMG ALIGN=BOTTOM SRC="_10375_figure336.gif"><BR>
+<STRONG>Figure 2:</STRONG> Source for the program <EM>halt.c</EM><BR>
+<P>
+<P>
+The actual instructions for making system calls are found in <EM>start.s</EM>.
+Figure&nbsp;<A HREF="node21.html#startsfig">3</A> shows the subset of that file that is used by
+the halt program.  Again, lines 1-7 are assembler directives rather
+than instructions. Line 8 is the first actual instruction, and simply
+calls the procedure <EM>main</EM>, e.g., the main program in <EM>
+halt.c</EM>. Lines 9-10 are executed whenever the call to <EM>main</EM>
+returns, in which case we want to tell Nachos we are done via the
+``exit'' system call.
+<P>
+System calls are invoked at runtime by placing a code for the system
+call in register 2 and then executing the ``syscall'' machine
+instruction.  The ``syscall'' instruction is a trap instruction,
+meaning that the next instruction to be executed will be the first
+instruction of the trap handler. In Nachos, this effectively means
+that execution continues now in the procedure <EM>
+ExceptionHandler</EM>.  Consider lines 15-18, the steps involved in
+making an ``exit'' system call.  Line 16 places a code for ``exit'' in
+register r2, and line 17 performs the actual system call.  Line 18,
+the first instruction that will be executed after the system call
+simply returns to the caller. Note that the Exit system call normally
+won't return (if coded correctly!), but a return is provided anyway.
+<P>
+<P><A NAME="686">&#160;</A><A NAME="startsfig">&#160;</A><IMG ALIGN=BOTTOM SRC="_10375_figure347.gif"><BR>
+<STRONG>Figure 3:</STRONG> Instructions in <EM>start.s</EM> used by the program in <EM>
+halt.c</EM><BR>
+<P>
+<P>
+The actual steps in converting the <EM>halt.c</EM> source code into an
+executable program are shown in Figure&nbsp;<A HREF="node21.html#compilefig">4</A>. Line 1-3
+generate object code from the <EM>halt.c</EM> and <EM>start.s</EM>
+source files. Line 5 creates an executable binary. Note that listing
+<EM>start.o</EM> before <EM>halt.o</EM> insures that the code in start.s
+resides before that of the main program. Finally, line 6 translates
+the executable into Noff format, making it ready to execute under
+Nachos.
+<P>
+<P><A NAME="687">&#160;</A><A NAME="compilefig">&#160;</A><IMG ALIGN=BOTTOM SRC="_10375_figure359.gif"><BR>
+<STRONG>Figure 4:</STRONG> The output from <EM>make</EM> when compiling <EM>halt.c</EM>. <BR>
+<P>
+<P>
+The utility <EM>disassemble</EM> can be used to show the actual
+instructions in the halt binary.  The result of running disassemble on
+<EM>halt.coff</EM> (NOT <EM>halt</EM>) is given in
+Figure&nbsp;<A HREF="node21.html#disassemblefig">5</A>. The instructions are the same as
+described above, but the code is somewhat harder to understand
+because the labels have been replaced with addresses.
+<P>
+<P><A NAME="688">&#160;</A><A NAME="disassemblefig">&#160;</A><IMG ALIGN=BOTTOM SRC="_10375_figure369.gif"><BR>
+<STRONG>Figure 5:</STRONG> The disassembled output of the executable for the <EM>
+halt.c</EM> program.<BR>
+<P><HR><A NAME="tex2html325" HREF="node22.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html323" HREF="node17.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html319" HREF="node20.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html327" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html326" HREF="node22.html">Nachos Filesystem</A>
+<B>Up:</B> <A NAME="tex2html324" HREF="node17.html">User-Level Processes</A>
+<B> Previous:</B> <A NAME="tex2html320" HREF="node20.html">System Calls and Exception </A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Threads &amp; Scheduling</TITLE>
+<META NAME="description" CONTENT="Threads &amp; Scheduling">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html248" HREF="node15.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html246" HREF="node12.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html240" HREF="node13.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html250" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html249" HREF="node15.html">Synchronization and Mutual Exclusion</A>
+<B>Up:</B> <A NAME="tex2html247" HREF="node12.html">Nachos Threads</A>
+<B> Previous:</B> <A NAME="tex2html241" HREF="node13.html">Mechanics of Thread Switching</A>
+<BR> <P>
+<H2><A NAME="SECTION00042000000000000000">Threads &amp; Scheduling</A></H2>
+<P>
+Threads that are ready to run are kept on the <EM>ready</EM> <EM>
+list</EM>. A process is in the READY state only if it has all the
+resources it needs, other than the CPU. Processes blocked waiting for
+I/O, memory, etc. are generally stored in a queue associated with the
+resource being waited on.
+<P>
+The <EM>scheduler</EM> decides which thread to run next.  The scheduler
+is invoked whenever the current thread wishes to give up the CPU. For
+example, the current thread may have initiated an I/O operation and
+must wait for it to complete before executing further.  Alternatively,
+Nachos may preempt the current thread in order to prevent one thread
+from monopolizing the CPU.
+<P>
+The Nachos scheduling policy is simple: threads reside on a single,
+unprioritized ready list, and threads are selected in a round-robin
+fashion. That is, threads are always appended to the end of the
+ready list, and the scheduler always selects the thread at the front
+of the list.
+<P>
+Scheduling is handled by routines in the <EM>Scheduler</EM> object:
+<DL ><DT><STRONG>void ReadyToRun(Thread *thread):</STRONG>
+<DD> Make <EM>thread</EM> ready to
+run and place it on the ready list. Note that <EM>ReadyToRun</EM>
+doesn't actually start running the thread; it simply changes its state
+to READY and places it on the ready list. The thread won't start
+executing until later, when the scheduler chooses it.
+<P>
+<EM>ReadyToRun</EM> is invoked, for example, by <EM>Thread::Fork()</EM>
+after a new thread has been created.
+<P>
+<DT><STRONG>Thread *FindNextToRun():</STRONG>
+<DD> Select a ready thread and return
+it). <EM>FindNextToRun</EM>   simply returns the thread at the front of
+the ready list.
+<P>
+<DT><STRONG>void Run(Thread *nextThread):</STRONG>
+<DD> Do the dirty work of suspending
+the current thread and switching to the new one. Note that it is the
+currently running thread that calls <EM>Run()</EM>. A thread calls this
+routine when it no longer wishes to execute.
+<P>
+ </DL>
+<P>
+<EM>Run()</EM> does the following:
+<OL><LI> Before actually switching to the new thread, check to see if the
+current thread overflowed its stack. This is done by placing a
+sentinel value at the top of the stack when the thread is initially
+created.  If the running thread ever overflows its stack, the sentinel
+value will be overwritten, changing its value.  By checking for the
+sentinel value every time we switch threads, we can catch threads
+overflowing their stacks.<LI> Change the state of newly selected thread to RUNNING. Nachos
+assumes that the calling routine (e.g. the current thread) has already
+changed its state to something else, (READY, BLOCKED, etc.) before
+calling <EM>Run()</EM>.<LI> Actually switch to the next thread by invoking <EM>
+Switch()</EM>. After <EM>Switch</EM> returns, we are now executing as the new
+thread. Note, however, that because the thread being switched to
+previously called <EM>Switch</EM> from <EM>Run()</EM>, execution
+continues in <EM>Run()</EM> at the statement immediately following the
+call to <EM>Switch</EM>.<LI> If the previous thread is terminating itself (as indicated by
+the <EM>threadToBeDestroyed</EM> variable), kill it now (after <EM>
+Switch()</EM>). As described in Section&nbsp;<A HREF="node12.html#finishproblem">3</A>, threads
+cannot terminate themselves directly; another thread must do so.  It
+is important to understand that it is actually another thread that
+physically terminates the one that called <EM>Finish().</EM>
+</OL><HR><A NAME="tex2html248" HREF="node15.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html246" HREF="node12.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html240" HREF="node13.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html250" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html249" HREF="node15.html">Synchronization and Mutual Exclusion</A>
+<B>Up:</B> <A NAME="tex2html247" HREF="node12.html">Nachos Threads</A>
+<B> Previous:</B> <A NAME="tex2html241" HREF="node13.html">Mechanics of Thread Switching</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

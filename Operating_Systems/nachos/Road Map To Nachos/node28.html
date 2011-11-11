@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Directories</TITLE>
+<META NAME="description" CONTENT="Directories">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html410" HREF="node29.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html408" HREF="node26.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html402" HREF="node27.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html412" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html411" HREF="node29.html">Putting It All Together</A>
+<B>Up:</B> <A NAME="tex2html409" HREF="node26.html">File System Physical Representation</A>
+<B> Previous:</B> <A NAME="tex2html403" HREF="node27.html">File Header</A>
+<BR> <P>
+<H3><A NAME="SECTION00064200000000000000">Directories</A></H3>
+<P>
+Nachos supports a single top-level directory, managed by the <EM>
+Directory</EM> object.  When a file is created, it is added to the
+directory; likewise, deleting a file results in its removal from the
+directory. Directory entries themselves consist of (filename, fnode,
+free_flag) triplets, with the <EM>free_flag</EM> indicating whether
+that directory slot is currently allocated. The following directory
+operations are supported:
+<DL ><DT><STRONG>Directory(int size):</STRONG>
+<DD> This constructor creates an (in-memory)
+directory object capable of holding <EM>size</EM> entries.
+<P>
+<DT><STRONG>void FetchFrom(OpenFile *file):</STRONG>
+<DD> Fetch the directory contents
+stored in file <EM>file</EM>.
+<P>
+<DT><STRONG>void WriteBack(OpenFile *file):</STRONG>
+<DD> Flush the contents of
+the directory to the file <EM>file.</EM>
+<P>
+<DT><STRONG>int Find(char *name):</STRONG>
+<DD> Search the directory for a file called
+<EM>name</EM>, returning its fnode number if the file exists.
+<P>
+<DT><STRONG>bool Add(char *name, int newSector):</STRONG>
+<DD> Add the file <EM>name</EM>
+with fnode <EM>newSector</EM> to the directory. Note that this routine
+only updates the in-memory copy of the directory.  To make the
+directory changes permanent, <EM>WriteBack</EM> must subsequently be
+invoked.
+<P>
+<DT><STRONG>bool Remove(char *name):</STRONG>
+<DD> Remove file <EM>name</EM> from the
+directory. Note that the <EM>Remove</EM> operator simply updates the
+directory; the <EM>FileHeader</EM> and data sectors associated with
+<EM>name</EM> are deallocated separately. In addition, a subsequent
+call to <EM>WriteBack</EM> is needed to make the changes permanent.
+<P>
+<DT><STRONG>List()</STRONG>
+<DD> Print out the directory contents (debugging).
+<P>
+<DT><STRONG>Print()</STRONG>
+<DD> Print out contents of all files in the directory (debugging).
+<P>
+ </DL><BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

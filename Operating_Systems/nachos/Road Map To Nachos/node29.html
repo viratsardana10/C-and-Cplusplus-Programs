@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Putting It All Together</TITLE>
+<META NAME="description" CONTENT="Putting It All Together">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html419" HREF="node30.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html417" HREF="node26.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html413" HREF="node28.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html421" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html420" HREF="node30.html">Experience With Nachos Assignments</A>
+<B>Up:</B> <A NAME="tex2html418" HREF="node26.html">File System Physical Representation</A>
+<B> Previous:</B> <A NAME="tex2html414" HREF="node28.html">Directories</A>
+<BR> <P>
+<H3><A NAME="SECTION00064300000000000000">Putting It All Together</A></H3>
+<P>
+On disk, both the list of free sectors and the top-level directory are
+stored within regular Nachos files.  The free list is stored as a bit
+map, one bit per sector (e.g., allocated or free), with the file
+itself stored in fnode 0.  Thus, finding a free sector in the
+filesystem requires reading the file associated with fnode 0, using
+the bitmap functions to locate free sector(s), and then flushing the
+file changes back to disk (via the appropriate <EM>WriteBack</EM>
+routines) to make the changes permanent.
+<P>
+Likewise, the top-level directory is stored in a file associated with
+fnode 1. Updating the directory when creating a new file requires
+reading the file associated with fnode 1, finding an unused directory
+entry, initializing it, and then writing the directory back out to
+disk.
+<P>
+When a file system is created, the system initializes the freelist and
+top-level directory and then opens the files containing the two main data
+structures.  Thus, the current contents of the free list and directory
+(as stored on disk) can be accessed via the <EM>``OpenFile *''</EM>
+variables <EM>freeMapFile</EM> and <EM>directoryFile</EM>.
+<P>
+When creating and modifying Nachos files, one must be careful to keep
+track of what data structures are on disk, and which ones are in
+memory. For example, when creating a file, a new <EM>FileHeader</EM>
+must be allocated, together with sectors to hold the data (free list
+file). The top-level directory must also be updated.  However, these
+changes don't become permanent until the updated free list and
+directory files are flushed to disk.
+<P>
+If one traces through the code for <EM>FileSystem::Create</EM>, one
+sees that all the allocations and updates are first made in memory
+local to the calling thread, and only after all allocations have
+succeeded without error are the changes made permanent by committing
+them to disk.  This approach greatly simplifies error recovery when
+(say) there are enough free blocks to create the file, but the
+directory has no room to hold the new file.  By not flushing to disk
+the allocations that succeeded, they do not actually take effect, and
+cancelling the entire transaction is straightforward.
+<P>
+Note also that the supplied <EM>FileSystem</EM> code assumes that only
+a single thread accesses the filesystem at any one time.
+Specifically, consider what would happen if two threads attempted to
+create a file simultaneously.  One scenario would have both threads
+fetching the current freemap, both updating their local copies, and
+then both writing them later.  At best, only one set of changes will
+appear on disk. At worst, the disk becomes corrupted.
+<P>
+No attempt has been made to reduce disk latencies by clustering
+related blocks in adjacent sectors.
+<HR><A NAME="tex2html419" HREF="node30.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html417" HREF="node26.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html413" HREF="node28.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html421" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html420" HREF="node30.html">Experience With Nachos Assignments</A>
+<B>Up:</B> <A NAME="tex2html418" HREF="node26.html">File System Physical Representation</A>
+<B> Previous:</B> <A NAME="tex2html414" HREF="node28.html">Directories</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

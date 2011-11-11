@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>System Calls and Exception Handling</TITLE>
+<META NAME="description" CONTENT="System Calls and Exception Handling">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html316" HREF="node21.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html314" HREF="node17.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html308" HREF="node19.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html318" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html317" HREF="node21.html">Execution Trace of User-Level </A>
+<B>Up:</B> <A NAME="tex2html315" HREF="node17.html">User-Level Processes</A>
+<B> Previous:</B> <A NAME="tex2html309" HREF="node19.html">Creating a Noff Binary</A>
+<BR> <P>
+<H2><A NAME="SECTION00053000000000000000">System Calls and Exception Handling</A></H2>
+<P>
+User programs invoke system calls by executing the MIPS ``syscall''
+instruction, which generates a hardware trap into the Nachos kernel.
+The Nachos/MIPS simulator implements traps by invoking the Routine
+<EM>RaiseException()</EM>, passing it a arguments indicating the exact
+cause of the trap.  <EM>RaiseException</EM>, in turn, calls <EM>
+ExceptionHandler</EM> to take care of the specific problem. <EM>
+ExceptionHandler</EM> is passed a single argument indicating the precise
+cause of the trap.
+<P>
+The ``syscall'' instruction indicates a system call is requested, but
+doesn't indicate <EM>which</EM> system call to perform.  By convention,
+user programs place the code indicating the particular system call
+desired in register <EM>r2</EM> before executing the ``syscall''
+instruction. Additional arguments to the system call (when
+appropriate) can be found in registers <EM>r4-r7</EM>, following the
+standard C procedure call linkage conventions. Function (and system
+call) return values are expected to be in register <EM>r2</EM> on
+return.
+<P>
+Warning: When accessing user memory from within the exception handler
+(or within Nachos in general), user-level addresses cannot be
+referenced directly. Recall that user-level processes execute in their
+own private address spaces, which the kernel cannot reference
+directly.  Attempts to dereference pointers passed as arguments to
+system calls will likely lead to problems (e.g., segmentation faults)
+if referenced directly.  Use <EM>ReadMem</EM> and <EM>WriteMem</EM> to
+dereference pointers passed as arguments to system calls.  Consult
+Section&nbsp;<A HREF="node7.html#hardwarevm">2.4</A> for more details.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

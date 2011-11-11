@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Real-Time Clock Interrupts</TITLE>
+<META NAME="description" CONTENT="Real-Time Clock Interrupts">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html158" HREF="node7.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html156" HREF="node3.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html150" HREF="node5.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html160" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html159" HREF="node7.html">Address Translation</A>
+<B>Up:</B> <A NAME="tex2html157" HREF="node3.html">Nachos Machine</A>
+<B> Previous:</B> <A NAME="tex2html151" HREF="node5.html">Interrupt Management</A>
+<BR> <P>
+<H2><A NAME="SECTION00033000000000000000">Real-Time Clock Interrupts</A></H2>
+<P>
+Nachos provides a <EM>Timer</EM> object that simulates a real time
+clock, generating interrupts at regular intervals. It is implemented
+using the same event driven interrupt mechanism described above. <EM>
+Timer</EM> supports the following operations:
+<DL ><DT><STRONG>Timer(VoidFunctionPtr timerHandler, int callArg, bool
+doRandom)</STRONG>
+<DD> The <EM>Timer</EM> constructor creates a real-time clock that interrupts
+every <EM>TimerTicks</EM> (100) time units. When the timer goes off,
+the Nachos simulator invokes procedure <EM>timerHandler</EM>, passing
+it <EM>callArg</EM> as an argument.
+<P>
+To add a bit of non-determinism to the system, argument <EM>
+doRandom</EM> specifies that the time between interrupts should be taken
+from a uniform interval between 1 and  <IMG WIDTH=132 HEIGHT=24 ALIGN=MIDDLE ALT="tex2html_wrap_inline1013" SRC="img1.gif"  > .
+<P>
+The real-time clock can be used to provide preemption.
+<P>
+ </DL>
+<P>
+Note that starting Nachos with the ``-rs'' option creates a timer
+object that interrupts at random intervals and preempts the currently
+running thread.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

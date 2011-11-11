@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<!--Converted with LaTeX2HTML 96.1 (Feb 5, 1996) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds -->
+<HTML>
+<HEAD>
+<TITLE>Process Creation</TITLE>
+<META NAME="description" CONTENT="Process Creation">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="main.css">
+</HEAD>
+<BODY LANG="EN">
+ <A NAME="tex2html294" HREF="node19.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html292" HREF="node17.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html286" HREF="node17.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html296" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html295" HREF="node19.html">Creating a Noff Binary</A>
+<B>Up:</B> <A NAME="tex2html293" HREF="node17.html">User-Level Processes</A>
+<B> Previous:</B> <A NAME="tex2html287" HREF="node17.html">User-Level Processes</A>
+<BR> <P>
+<H2><A NAME="SECTION00051000000000000000">Process Creation</A></H2>
+<P>
+Nachos processes are formed by creating an address space, allocating
+physical memory for the address space, loading the contents of the
+executable into physical memory, initializing registers and address
+translation tables, and then invoking <EM>machine::Run()</EM> to start
+execution.  <EM>Run()</EM> simply ``turns on'' the simulated MIPS
+machine, having it enter an infinite loop that executes instructions
+one at a time).
+<P>
+Stock Nachos assumes that only a single user program exists at a given
+time. Thus, when an address space is created, Nachos assumes that no
+one else is using physical memory and simply zeros out all of physical
+memory (e.g., the <EM>mainMemory</EM> character array). Nachos then
+reads the binary into physical memory starting at location <EM>
+mainMemory</EM> and initializes the translation tables to do a
+one-to-one mapping between virtual and physical addresses (e.g., so
+that any virtual address N maps directly into the physical address
+N). Initialization of registers consists of zeroing them all out,
+setting <EM>PCReg</EM> and <EM>NextPCReg</EM> to 0 and 4 respectively,
+and setting the stackpointer to the largest virtual address of the
+process (the stack grows downward towards the heap and text).  Nachos
+assumes that execution of user-programs begins at the first
+instruction in the text segment (e.g., virtual address 0).
+<P>
+When support for multiple user processes has been added, two other
+Nachos routines are necessary for process switching.  Whenever the
+current processes is suspended (e.g., preempted or put to sleep), the
+scheduler invokes the routine <EM>AddrSpace::SaveUserState()</EM>, in
+order to properly save address-space related state that the low-level
+thread switching routines do not know about. This becomes necessary
+when using virtual memory; when switching from one process to another,
+a new set of address translation tables needs to be loaded. The Nachos
+scheduler calls <EM>SaveUserState()</EM> whenever it is about to
+preempt one thread and switch to another. Likewise, before switching
+to a new thread, the Nachos scheduler invokes <EM>
+AddrSpace::RestoreUserState</EM>. <EM>RestoreUserState()</EM> insures
+that the proper address translation tables are loaded before execution
+resumes.
+<P>
+<HR><A NAME="tex2html294" HREF="node19.html"><IMG WIDTH=37 HEIGHT=24 ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/icons/latex/next_motif.gif"></A> <A NAME="tex2html292" HREF="node17.html"><IMG WIDTH=26 HEIGHT=24 ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/icons/latex/up_motif.gif"></A> <A NAME="tex2html286" HREF="node17.html"><IMG WIDTH=63 HEIGHT=24 ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/icons/latex/previous_motif.gif"></A> <A NAME="tex2html296" HREF="node1.html"><IMG WIDTH=65 HEIGHT=24 ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/icons/latex/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME="tex2html295" HREF="node19.html">Creating a Noff Binary</A>
+<B>Up:</B> <A NAME="tex2html293" HREF="node17.html">User-Level Processes</A>
+<B> Previous:</B> <A NAME="tex2html287" HREF="node17.html">User-Level Processes</A>
+<P><ADDRESS>
+<I>Thomas Narten <BR>
+Mon Feb  3 15:00:27 EST 1997</I>
+</ADDRESS>
+</BODY>
+</HTML>

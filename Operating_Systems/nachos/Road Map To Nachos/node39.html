@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!- Converted with LaTeX2HTML 0.6.4 (Tues Aug 30 1994) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds ->
+<P>
+<HEAD>
+<TITLE> Common Errors</TITLE>
+<meta name="description" value=" Common Errors">
+<meta name="keywords" value="main">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+</HEAD>
+<BODY><P>
+ <BR> <HR><A NAME=tex2html540 HREF="node40.html"><IMG ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/images/latex2html/next_motif.gif"></A> <A NAME=tex2html538 HREF="node33.html"><IMG ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/images/latex2html/up_motif.gif"></A> <A NAME=tex2html534 HREF="node38.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/images/latex2html/previous_motif.gif"></A> <A NAME=tex2html542 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/images/latex2html/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME=tex2html541 HREF="node40.html"> MIPS Architecture</A>
+<B>Up:</B> <A NAME=tex2html539 HREF="node33.html"> Experience With Nachos </A>
+<B> Previous:</B> <A NAME=tex2html535 HREF="node38.html"> File System</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00086000000000000000> Common Errors</A></H2>
+<P>
+This section discusses common problems that  students ran into over
+and over again (even after having been warned about them).
+<P>
+<OL><LI> The VM assignment works mostly correctly, but running <em>matmult</em> in background prevents the shell from executing any more
+commands, even though it prompts the user and seems to read the
+command OK.
+<P>
+<A NAME=readmemproblem>&#160;</A>
+What is happening: The pages (in user space) holding the arguments to
+the system calls are being paged out before the system call routines
+copy the contents of those pages into local variables.  For example,
+<em>Exec</em> needs the name of the binary file to run.  Routine <em>machine::ReadMem</em> does indeed invoke <em>Translate</em> to perform
+the translation, and if the target page is not present in physical
+memory, generates a page fault (e.g., by invoking <em>RaiseException</em>).  <em>However</em>, <em>ReadMem</em> does <em>not</em>
+retry the fetch operation; instead, it returns FALSE indicating that
+the operation failed. Thus, the first byte the user attempts to fetch
+will not be retrieved.  If Nachos immediately restarts the operation,
+the page will now be present in memory (the probablity is very high
+anyway).  If <em>ReadMem</em> is called from a loop that fetches one
+character at a time, skipping the first character will likely cause
+the wrong thing to happen (it is frequently NULL in practice,
+terminating the string).  The same problem occurs with <em>WriteMem.</em> and can occur with any system calls that take pointers
+as arguments.
+<P>
+One shortcut that students want to make is to simply retry the <em>ReadMem</em> operation when it fails.  That is, they assume that the
+only reason <em>ReadMem</em> fails is because the target page was paged
+out.  If the pointer is invalid (e.g., outside of the process's
+address space), however, retrying the operation results in the same
+failure.  Indeed, Nachos goes into an infinite loop at this point.
+<P>
+<LI> Problem: value of variables (strings in particular) changes
+randomly.
+<P>
+What is happening: Dangling references.  Although this is a standard C
+programming problem, students repeatedly forgot to allocate space for
+strings.  For example, as part of the <em>Exec</em> system call, it is
+useful for debugging purposes to store the name of the file with the
+address space.  This requires allocating space to hold the string and
+copying that file name into that newly allocated space.  In contrast,
+students often simply set a pointer to the file name argument passed
+to the routine that implements <em>Exec</em>.  However, when that
+routine returns, the <em>Exec</em> system call completes, and the space
+that held the file name gets deallocated.  Chance are good that the
+next system call to be executed will reuse the same space, placing
+different data in its contents.
+<P>
+</OL>
+<BR> <HR><A NAME=tex2html540 HREF="node40.html"><IMG ALIGN=BOTTOM ALT="next" SRC="http://www.cs.duke.edu/images/latex2html/next_motif.gif"></A> <A NAME=tex2html538 HREF="node33.html"><IMG ALIGN=BOTTOM ALT="up" SRC="http://www.cs.duke.edu/images/latex2html/up_motif.gif"></A> <A NAME=tex2html534 HREF="node38.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="http://www.cs.duke.edu/images/latex2html/previous_motif.gif"></A> <A NAME=tex2html542 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="http://www.cs.duke.edu/images/latex2html/contents_motif.gif"></A>  <BR>
+<B> Next:</B> <A NAME=tex2html541 HREF="node40.html"> MIPS Architecture</A>
+<B>Up:</B> <A NAME=tex2html539 HREF="node33.html"> Experience With Nachos </A>
+<B> Previous:</B> <A NAME=tex2html535 HREF="node38.html"> File System</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+<I> Thomas Narten <BR>
+Wed Jan  4 09:05:17 EST 1995</I>
+</ADDRESS>
+</BODY>
